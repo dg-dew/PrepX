@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Resume ATS Checker · CareerPrepX</title>
+<meta name="description" content="Upload your resume and get an ATS score with keyword and section-level fixes." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span> Career<span style="color:var(--accent)">PrepX</span></a>
+    <nav class="side-nav">
+      <a href="dashboard.html">◆ Dashboard</a>
+      <a href="aptitude.html">⚡ Aptitude</a>
+      <a href="resume.html" class="active">📄 Resume ATS</a>
+      <a href="coding.html">⌨ Coding Arena</a>
+      <a href="interview.html">🎤 Mock Interview</a>
+      <a href="recruiter.html">🏢 Recruiter Portal</a>
+      <a href="index.html">← Back to site</a>
+    </nav>
+    <div style="margin-top:20px;"><button class="theme-toggle" data-theme-toggle style="width:100%;justify-content:center;"><span data-theme-label>☀ Light</span></button></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Resume ATS Checker</h1>
+        <p>Analyzed against 340+ recruiter JD templates for the SDE role family.</p>
+      </div>
+      <div class="flex" style="gap:10px;">
+        <button class="btn btn-outline">Change JD</button>
+        <button class="btn btn-primary">Rescan Resume</button>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:1.1fr 1fr; gap:20px;">
+      <div class="grid" style="gap:20px; align-content:start;">
+        <div class="drop">
+          <div style="font-size:36px;">⇪</div>
+          <h3 style="margin-top:8px;">Drag &amp; drop your resume</h3>
+          <p class="muted small" style="margin-top:6px;">PDF or DOCX, up to 5MB — parsed on your device.</p>
+          <input type="file" accept=".pdf,.docx" style="margin-top:14px;" />
+          <div class="muted small" style="margin-top:10px;">Currently analyzing: <strong style="color:var(--text);">Aarav_Sharma_Resume_v4.pdf</strong></div>
+        </div>
+
+        <div class="panel">
+          <h3>Section Audit</h3>
+          <table class="table" style="margin-top:10px;">
+            <thead><tr><th>Section</th><th>Status</th><th>Suggestion</th></tr></thead>
+            <tbody>
+              <tr><td>Contact Info</td><td><span class="pill pill-success">Complete</span></td><td class="muted">Add LinkedIn URL shortener</td></tr>
+              <tr><td>Summary</td><td><span class="pill pill-success">Strong</span></td><td class="muted">Keep to 3 lines</td></tr>
+              <tr><td>Skills</td><td><span class="pill pill-warning">Improve</span></td><td class="muted">Group by category (Languages / Frameworks / Cloud)</td></tr>
+              <tr><td>Experience</td><td><span class="pill pill-success">Strong</span></td><td class="muted">Front-load metrics</td></tr>
+              <tr><td>Projects</td><td><span class="pill pill-warning">Improve</span></td><td class="muted">Add measurable outcomes to 2 of 3 projects</td></tr>
+              <tr><td>Education</td><td><span class="pill pill-success">Complete</span></td><td class="muted">—</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="grid" style="gap:20px; align-content:start;">
+        <div class="panel" style="text-align:center;">
+          <div class="tiny">ATS Score</div>
+          <div class="ring" style="margin-top:12px;">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              <circle cx="90" cy="90" r="76" stroke="var(--surface-2)" stroke-width="14" fill="none"/>
+              <circle cx="90" cy="90" r="76" stroke="url(#g2)" stroke-width="14" fill="none" stroke-dasharray="477" stroke-dashoffset="38" stroke-linecap="round"/>
+              <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#22D3A5"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs>
+            </svg>
+            <div class="num">92</div>
+          </div>
+          <p class="muted small" style="margin-top:8px;">Passes 8 of 10 filters at Amazon, Google, and Microsoft.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Keyword Match</h3>
+          <div style="margin-top:14px;">
+            <div class="tiny">Found (24)</div>
+            <div class="kw" style="margin-top:8px;">
+              <span class="pill pill-success">Python</span><span class="pill pill-success">Java</span><span class="pill pill-success">System Design</span>
+              <span class="pill pill-success">REST</span><span class="pill pill-success">SQL</span><span class="pill pill-success">CI/CD</span>
+              <span class="pill pill-success">Docker</span><span class="pill pill-success">AWS</span><span class="pill pill-success">Git</span>
+            </div>
+            <div class="tiny" style="margin-top:16px;">Missing (5)</div>
+            <div class="kw" style="margin-top:8px;">
+              <span class="pill pill-danger">Kubernetes</span><span class="pill pill-danger">GraphQL</span>
+              <span class="pill pill-danger">Terraform</span><span class="pill pill-danger">gRPC</span>
+              <span class="pill pill-danger">Kafka</span>
+            </div>
+            <div class="tiny" style="margin-top:16px;">Suggested to add (4)</div>
+            <div class="kw" style="margin-top:8px;">
+              <span class="pill pill-accent">TypeScript</span><span class="pill pill-accent">Redis</span>
+              <span class="pill pill-accent">Observability</span><span class="pill pill-accent">Load Testing</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

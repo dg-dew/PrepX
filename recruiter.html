@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Recruiter Dashboard · CareerPrepX</title>
+<meta name="description" content="Verified candidate pipeline with score-based filtering for enterprise recruiters." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span> Career<span style="color:var(--accent)">PrepX</span></a>
+    <nav class="side-nav">
+      <a href="dashboard.html">◆ Dashboard</a>
+      <a href="aptitude.html">⚡ Aptitude</a>
+      <a href="resume.html">📄 Resume ATS</a>
+      <a href="coding.html">⌨ Coding Arena</a>
+      <a href="interview.html">🎤 Mock Interview</a>
+      <a href="recruiter.html" class="active">🏢 Recruiter Portal</a>
+      <a href="index.html">← Back to site</a>
+    </nav>
+    <div style="margin-top:20px;"><button class="theme-toggle" data-theme-toggle style="width:100%;justify-content:center;"><span data-theme-label>☀ Light</span></button></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Candidate Pipeline — CSE Batch 2027</h1>
+        <p>340 candidates matched · 42 shortlisted · 8 in final round</p>
+      </div>
+      <div class="flex" style="gap:10px;">
+        <button class="btn btn-outline">Export CSV</button>
+        <button class="btn btn-primary">Invite to Interview</button>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="grid" style="grid-template-columns:repeat(4,1fr); gap:14px;">
+        <div>
+          <div class="tiny">Score Range</div>
+          <select class="select" style="width:100%; margin-top:8px; padding:10px 12px;">
+            <option>80 – 100 (Placement-ready)</option><option>70 – 79 (Strong)</option><option>60 – 69 (Developing)</option>
+          </select>
+        </div>
+        <div>
+          <div class="tiny">Domain</div>
+          <select class="select" style="width:100%; margin-top:8px; padding:10px 12px;">
+            <option>Software Engineering</option><option>Data Science</option><option>Product Management</option>
+          </select>
+        </div>
+        <div>
+          <div class="tiny">Availability</div>
+          <select class="select" style="width:100%; margin-top:8px; padding:10px 12px;">
+            <option>Available from Jul 2026</option><option>Immediately</option><option>Jan 2027</option>
+          </select>
+        </div>
+        <div>
+          <div class="tiny">Campus</div>
+          <select class="select" style="width:100%; margin-top:8px; padding:10px 12px;">
+            <option>All partner campuses</option><option>CHRIST University</option><option>VIT</option><option>NIT Trichy</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="metrics" style="margin-bottom:20px;">
+      <div class="metric"><div class="lbl">Verified Candidates</div><div class="v">340</div></div>
+      <div class="metric"><div class="lbl">Avg. Readiness</div><div class="v">82</div></div>
+      <div class="metric"><div class="lbl">Shortlisted</div><div class="v">42</div></div>
+      <div class="metric"><div class="lbl">Offer Acceptance</div><div class="v">78%</div></div>
+    </div>
+
+    <div class="panel" style="padding:0; overflow:hidden;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="width:30px;"><input type="checkbox"/></th>
+            <th>Candidate</th>
+            <th>Readiness</th>
+            <th>Aptitude</th>
+            <th>Coding Rank</th>
+            <th>Interview</th>
+            <th>Campus</th>
+            <th style="text-align:right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Priya Nair</strong><div class="muted small">ISE · 2027</div></td>
+            <td><span class="pill pill-success">91</span></td><td>94</td><td>Top 3%</td><td>92</td><td>CHRIST</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Sana Kapoor</strong><div class="muted small">CSE · 2027</div></td>
+            <td><span class="pill pill-success">88</span></td><td>90</td><td>Top 6%</td><td>85</td><td>VIT</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Aarav Sharma</strong><div class="muted small">ISE · 2027</div></td>
+            <td><span class="pill pill-success">85</span></td><td>88</td><td>Top 8%</td><td>87</td><td>CHRIST</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Rahul Verma</strong><div class="muted small">CSE · 2027</div></td>
+            <td><span class="pill pill-success">83</span></td><td>85</td><td>Top 11%</td><td>82</td><td>NIT Trichy</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Meera Iyer</strong><div class="muted small">ECE · 2027</div></td>
+            <td><span class="pill pill-primary">79</span></td><td>82</td><td>Top 13%</td><td>78</td><td>BITS Pilani</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Rohan Mehta</strong><div class="muted small">CSE · 2027</div></td>
+            <td><span class="pill pill-primary">78</span></td><td>76</td><td>Top 14%</td><td>81</td><td>Manipal</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Kiran Devi</strong><div class="muted small">IT · 2027</div></td>
+            <td><span class="pill pill-warning">72</span></td><td>70</td><td>Top 22%</td><td>74</td><td>SRM</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox"/></td>
+            <td><strong>Ananya Ghosh</strong><div class="muted small">CSE · 2027</div></td>
+            <td><span class="pill pill-warning">70</span></td><td>68</td><td>Top 26%</td><td>72</td><td>VIT</td>
+            <td style="text-align:right;"><button class="btn btn-outline" style="padding:6px 14px;">View Profile</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

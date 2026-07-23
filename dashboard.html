@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dashboard · CareerPrepX</title>
+<meta name="description" content="Your personalized placement dashboard — readiness score, streaks, and module progress." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span> Career<span style="color:var(--accent)">PrepX</span></a>
+    <nav class="side-nav">
+      <a href="dashboard.html" class="active">◆ Dashboard</a>
+      <a href="aptitude.html">⚡ Aptitude</a>
+      <a href="resume.html">📄 Resume ATS</a>
+      <a href="coding.html">⌨ Coding Arena</a>
+      <a href="interview.html">🎤 Mock Interview</a>
+      <a href="recruiter.html">🏢 Recruiter Portal</a>
+      <a href="index.html">← Back to site</a>
+    </nav>
+    <div class="panel" style="margin-top:20px;">
+      <div class="tiny">Placement Readiness</div>
+      <div style="font-family:'Space Grotesk';font-size:34px;font-weight:700;margin-top:4px;">85</div>
+      <div class="bar" style="margin-top:8px;"><i style="width:85%"></i></div>
+      <div class="muted small" style="margin-top:8px;">Top 12% in your cohort</div>
+    </div>
+    <div style="margin-top:20px;">
+      <button class="theme-toggle" data-theme-toggle style="width:100%;justify-content:center;"><span data-theme-label>☀ Light</span></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Good morning, Aarav — <span style="color:var(--accent)">Week 6</span></h1>
+        <p>You're 12 points from your target of 90. Two focus tasks today.</p>
+      </div>
+      <div class="flex" style="gap:10px;">
+        <button class="btn btn-outline">Export report</button>
+        <a class="btn btn-primary" href="aptitude.html">Continue today's plan →</a>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="lbl">Readiness Score</div><div class="v">85 <span class="pill pill-success" style="font-size:12px;vertical-align:middle;">+4</span></div><div class="sub">▲ up from 81 last week</div></div>
+      <div class="metric"><div class="lbl">Streak</div><div class="v">14 <span class="muted" style="font-size:16px;">days</span></div><div class="sub">Longest yet — keep going</div></div>
+      <div class="metric"><div class="lbl">ATS Score</div><div class="v">92<span class="muted" style="font-size:16px;">%</span></div><div class="sub">Passes 8 of 10 filters</div></div>
+      <div class="metric"><div class="lbl">Coding Rank</div><div class="v">Top 8%</div><div class="sub">▲ 342 places this week</div></div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:2fr 1fr; margin-top:24px;">
+      <div class="panel">
+        <div class="between" style="margin-bottom:16px;"><h3>Module Progress</h3><span class="pill">Week 6 of 10</span></div>
+        <div class="grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="panel panel-strong">
+            <div class="tiny">Aptitude</div>
+            <div style="font-family:'Space Grotesk'; font-size:22px; font-weight:700; margin:6px 0 10px;">88 / 100</div>
+            <div class="bar"><i style="width:88%;background:var(--success);"></i></div>
+            <div style="margin-top:12px;"><span class="pill pill-success">✓ Completed</span></div>
+          </div>
+          <div class="panel panel-strong">
+            <div class="tiny">Coding</div>
+            <div style="font-family:'Space Grotesk'; font-size:22px; font-weight:700; margin:6px 0 10px;">74 / 100</div>
+            <div class="bar"><i style="width:74%"></i></div>
+            <div style="margin-top:12px;"><span class="pill pill-primary">● In Progress</span></div>
+          </div>
+          <div class="panel panel-strong">
+            <div class="tiny">Mock Interview</div>
+            <div style="font-family:'Space Grotesk'; font-size:22px; font-weight:700; margin:6px 0 10px;">2 of 3 rounds</div>
+            <div class="bar"><i style="width:66%;background:var(--warning);"></i></div>
+            <div style="margin-top:12px;"><span class="pill pill-warning">◐ Due Today</span></div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;">
+          <div class="between" style="margin-bottom:12px;"><h3 style="font-size:16px;">This week's focus</h3><a href="aptitude.html" class="muted small">View all →</a></div>
+          <div class="grid" style="gap:10px;">
+            <div class="test"><span>Graphs · Dijkstra with priority queue</span><span class="pill pill-primary">45 min</span></div>
+            <div class="test"><span>Behavioral · Leadership under pressure</span><span class="pill pill-warning">Due today</span></div>
+            <div class="test"><span>DI · Line-graph interpretation drill</span><span class="pill">20 min</span></div>
+            <div class="test"><span>Resume · Add measurable outcomes to Projects</span><span class="pill">10 min</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Score Breakdown</h3>
+        <div style="margin-top:14px;">
+          <div class="metric-row"><span class="lbl">Aptitude</span><div class="bar"><i style="width:88%"></i></div><span class="val">88</span></div>
+          <div class="metric-row"><span class="lbl">Coding</span><div class="bar"><i style="width:74%"></i></div><span class="val">74</span></div>
+          <div class="metric-row"><span class="lbl">Interview</span><div class="bar"><i style="width:87%"></i></div><span class="val">87</span></div>
+          <div class="metric-row"><span class="lbl">Resume</span><div class="bar"><i style="width:92%"></i></div><span class="val">92</span></div>
+          <div class="metric-row"><span class="lbl">Consistency</span><div class="bar"><i style="width:83%"></i></div><span class="val">83</span></div>
+        </div>
+        <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border);">
+          <div class="tiny">Upcoming</div>
+          <div style="margin-top:10px;" class="grid">
+            <div class="test"><span>Mock 3 · Technical System Design</span><span class="pill">Fri</span></div>
+            <div class="test"><span>Coding Contest · Weekly 14</span><span class="pill">Sat</span></div>
+            <div class="test"><span>Recruiter Call · Amazon</span><span class="pill pill-accent">Mon</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>

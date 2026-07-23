@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Mock Interview · CareerPrepX</title>
+<meta name="description" content="Conversational AI mock interview with STAR-framework feedback and live metrics." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span> Career<span style="color:var(--accent)">PrepX</span></a>
+    <nav class="side-nav">
+      <a href="dashboard.html">◆ Dashboard</a>
+      <a href="aptitude.html">⚡ Aptitude</a>
+      <a href="resume.html">📄 Resume ATS</a>
+      <a href="coding.html">⌨ Coding Arena</a>
+      <a href="interview.html" class="active">🎤 Mock Interview</a>
+      <a href="recruiter.html">🏢 Recruiter Portal</a>
+      <a href="index.html">← Back to site</a>
+    </nav>
+    <div style="margin-top:20px;"><button class="theme-toggle" data-theme-toggle style="width:100%;justify-content:center;"><span data-theme-label>☀ Light</span></button></div>
+  </aside>
+
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Behavioral Round <span style="color:var(--accent)">2 of 3</span></h1>
+        <p>Target role: SDE-1 · Focus: Leadership &amp; Ownership</p>
+      </div>
+      <div class="flex" style="gap:10px;align-items:center;">
+        <span class="pill pill-primary">● Recording · 04:12</span>
+        <button class="btn btn-outline">Pause</button>
+        <button class="btn btn-primary">End &amp; Score</button>
+      </div>
+    </div>
+
+    <div class="grid" style="grid-template-columns:2fr 1fr; gap:20px;">
+      <div class="panel">
+        <div class="chat">
+          <div class="bubble ai">
+            <div class="who">AI Interviewer</div>
+            Walk me through a project where you had to make an unpopular technical decision. How did you get the team aligned?
+          </div>
+          <div class="bubble me">
+            <div class="who">You · 42s</div>
+            In our capstone we were building a payments layer. The team wanted to ship on Firebase because it was fast. I pushed back and proposed Postgres with a Prisma layer — slower to set up, but auditable. I built a 2-day spike to prove migrations wouldn't block us, presented it with cost + audit tradeoffs, and the team agreed. We shipped on time and had zero data incidents in 8 weeks.
+          </div>
+          <div class="bubble ai">
+            <div class="who">AI Interviewer</div>
+            Good — tell me one thing you'd change about how you led that alignment.
+          </div>
+          <div class="bubble me">
+            <div class="who">You · 28s</div>
+            I would have surfaced the cost model on day one instead of day three. I lost credibility for two days because the team assumed I was choosing complexity for its own sake.
+          </div>
+          <div class="bubble ai">
+            <div class="who">STAR Feedback</div>
+            <div class="grid" style="grid-template-columns:repeat(4,1fr); gap:10px; margin-top:8px;">
+              <div class="stat"><div class="v" style="color:var(--success)">A</div><div class="l">Situation</div></div>
+              <div class="stat"><div class="v" style="color:var(--success)">A+</div><div class="l">Task</div></div>
+              <div class="stat"><div class="v" style="color:var(--accent)">A</div><div class="l">Action</div></div>
+              <div class="stat"><div class="v" style="color:var(--warning)">B+</div><div class="l">Result</div></div>
+            </div>
+            <p class="muted small" style="margin-top:10px;">Strong action framing. Result would score higher with a quantified customer impact — request volume, latency, or dollar amount processed.</p>
+          </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:10px;">
+          <input class="select" style="flex:1; padding:12px 14px;" placeholder="Type your answer or press ● to speak..." />
+          <button class="btn btn-primary">Send</button>
+          <button class="btn btn-outline">● Speak</button>
+        </div>
+      </div>
+
+      <div class="grid" style="gap:16px; align-content:start;">
+        <div class="panel">
+          <h3>Live Metrics</h3>
+          <div style="margin-top:14px;">
+            <div class="metric-row"><span class="lbl">Confidence</span><div class="bar"><i style="width:87%"></i></div><span class="val">87</span></div>
+            <div class="metric-row"><span class="lbl">Delivery</span><div class="bar"><i style="width:81%"></i></div><span class="val">81</span></div>
+            <div class="metric-row"><span class="lbl">Clarity</span><div class="bar"><i style="width:79%"></i></div><span class="val">79</span></div>
+            <div class="metric-row"><span class="lbl">Depth</span><div class="bar"><i style="width:83%"></i></div><span class="val">83</span></div>
+            <div class="metric-row"><span class="lbl">Structure</span><div class="bar"><i style="width:90%"></i></div><span class="val">90</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Cadence</h3>
+          <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px;">
+            <div class="stat"><div class="v">142</div><div class="l">Words / min</div></div>
+            <div class="stat"><div class="v">6%</div><div class="l">Filler words</div></div>
+            <div class="stat"><div class="v">2.4s</div><div class="l">Avg. Pause</div></div>
+            <div class="stat"><div class="v">A-</div><div class="l">Vocal tone</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Coach Tips</h3>
+          <ul style="margin-top:10px; padding-left:18px; color:var(--text-muted); font-size:13.5px; line-height:1.9;">
+            <li>Anchor with one metric per story.</li>
+            <li>Slow down the first sentence.</li>
+            <li>End answers with the "what I'd do differently".</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
