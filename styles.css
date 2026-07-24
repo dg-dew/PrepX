@@ -327,3 +327,81 @@ footer .container { display: flex; justify-content: space-between; flex-wrap: wr
   letter-spacing: 0.12em;
   background: var(--surface-2);
 }
+/* Floating Button */
+/* Floating Button */
+#chat-button {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    z-index:9999;
+}
+
+
+/* Chat Popup */
+#chat-popup {
+    display:none;
+    position:fixed;
+
+    bottom:90px;
+    right:25px;
+
+    /* CHANGED WIDTH ONLY */
+    width:660px;
+
+    /* SAME HEIGHT */
+    height:650px;
+
+    background:#1a1a1a;
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.35);
+
+    z-index:9999;
+}
+
+
+/* Header */
+#chat-header {
+    height:55px;
+
+    background:#2563eb;
+
+    color:white;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 20px;
+}
+
+
+/* Close Button */
+#close-chat {
+    border:none;
+    background:none;
+    color:white;
+    cursor:pointer;
+    font-size:18px;
+}
+
+
+/* React App */
+#chat-frame {
+    width:100%;
+    height:595px;
+    border:none;
+}
