@@ -1,4 +1,6 @@
-// Theme Engine
+/* ==========================================================================
+   1. UNIFIED THEME ENGINE (WITH LOCALSTORAGE PERSISTENCE)
+   ========================================================================== */
 (function () {
   const KEY = 'careerprepx-theme';
   const saved = localStorage.getItem(KEY) || 'dark';
@@ -24,7 +26,22 @@
 })();
 
 /* ==========================================================================
-   PROCTORED CODING ARENA CONTROLLER WITH HISTORY & AUTO-EXIT
+   2. PRELOADER & SPLASH CONTROLLER
+   ========================================================================== */
+document.addEventListener('DOMContentLoaded', () => {
+  const preloader = document.getElementById('preloader');
+  if (preloader) {
+    setTimeout(() => {
+      preloader.classList.add('fade-out');
+      setTimeout(() => {
+        preloader.style.display = 'none';
+      }, 600);
+    }, 1000);
+  }
+});
+
+/* ==========================================================================
+   3. PROCTORED CODING ARENA CONTROLLER
    ========================================================================== */
 (function () {
   let codingViolationCount = 0;
@@ -43,7 +60,6 @@
   let timerInterval = null;
   let totalSeconds = 25 * 60;
 
-  // LocalStorage History to avoid showing previously attempted questions
   const SEEN_QUESTIONS_KEY = 'careerprepx_seen_questions';
   
   function getSeenQuestions() {
@@ -58,7 +74,6 @@
     }
   }
 
-  // Expanded Problem Database
   const problemBank = {
     frontend: {
       easy: [
@@ -204,24 +219,26 @@
   };
 
   window.syncPreSelection = function () {
-    const preDom = document.getElementById('pre-domain-select').value;
-    const preDiff = document.getElementById('pre-difficulty-select').value;
+    const preDom = document.getElementById('pre-domain-select')?.value;
+    const preDiff = document.getElementById('pre-difficulty-select')?.value;
 
     const mainDom = document.getElementById('domain-select');
     const mainDiff = document.getElementById('difficulty-select');
 
-    if (mainDom) mainDom.value = preDom;
-    if (mainDiff) mainDiff.value = preDiff;
+    if (mainDom && preDom) mainDom.value = preDom;
+    if (mainDiff && preDiff) mainDiff.value = preDiff;
 
-    currentDomain = preDom;
-    currentDifficulty = preDiff;
+    if (preDom) currentDomain = preDom;
+    if (preDiff) currentDifficulty = preDiff;
   };
 
   window.startProctoredTest = function () {
     syncPreSelection();
 
-    document.getElementById('pre-test-screen').style.display = 'none';
-    document.getElementById('coding-arena-screen').style.display = 'block';
+    const preScreen = document.getElementById('pre-test-screen');
+    const arenaScreen = document.getElementById('coding-arena-screen');
+    if (preScreen) preScreen.style.display = 'none';
+    if (arenaScreen) arenaScreen.style.display = 'block';
 
     const sidebar = document.getElementById('main-sidebar');
     if (sidebar) sidebar.style.display = 'none';
@@ -249,10 +266,8 @@
     const rawPool = (problemBank[currentDomain] || {})[currentDifficulty] || [];
     const seenList = getSeenQuestions();
 
-    // Filter out previously attempted questions
     activePool = rawPool.filter(q => !seenList.includes(q.id));
 
-    // Fallback: If user completed all questions, reset filter
     if (activePool.length === 0) {
       activePool = rawPool;
     }
@@ -321,7 +336,9 @@
       document.exitFullscreen();
     }
 
-    document.getElementById('coding-arena-screen').style.display = 'none';
+    const arenaScreen = document.getElementById('coding-arena-screen');
+    if (arenaScreen) arenaScreen.style.display = 'none';
+    
     const termScreen = document.getElementById('terminated-screen');
     const termText = document.getElementById('termination-reason-text');
 
@@ -331,12 +348,12 @@
     if (termScreen) termScreen.style.display = 'flex';
   }
 
-  /* SUBMISSION LOGIC WITH 2-ATTEMPT FAILURE EXITS */
   window.handleSubmissionAttempt = function () {
     const q = activePool[currentPoolIndex];
-    const userCode = document.getElementById('code-editor').value;
+    const editor = document.getElementById('code-editor');
+    if (!q || !editor) return;
 
-    if (!q) return;
+    const userCode = editor.value;
 
     const isPass = userCode.includes(q.expectedKeyword) && 
                    !userCode.includes("// Write solution") && 
@@ -352,7 +369,7 @@
         const modal = document.getElementById('wrong-answer-modal');
         if (modal) modal.style.display = 'flex';
       } else {
-        markQuestionAsSeen(q.id); // Mark as seen so they get a new question next time
+        markQuestionAsSeen(q.id);
         renderFailedState();
       }
     }
@@ -363,12 +380,10 @@
     if (modal) modal.style.display = 'none';
   };
 
-  /* AUTOMATIC EXIT COUNTDOWN HELPER */
   function startAutoExitCountdown(seconds) {
     let countdown = seconds;
     const quitBtn = document.getElementById('quit-mode-btn');
     
-    // Disable switching or re-submitting while exiting
     const submitBtn = document.getElementById('submit-code-btn');
     const switchBtn = document.getElementById('change-question-btn');
     if (submitBtn) { submitBtn.disabled = true; submitBtn.style.opacity = '0.5'; }
@@ -401,18 +416,18 @@
       badge.style.background = "#22D3A5";
     }
     
-    output.innerHTML = `<span style="color: #22D3A5; font-weight: 600;">✔ CORRECT ANSWER!</span>\n\nAll internal test cases passed successfully!\nRedirecting you back to the dashboard automatically...`;
-    
-    // Auto-scroll output container to bottom
-    output.scrollTop = output.scrollHeight;
+    if (output) {
+      output.innerHTML = `<span style="color: #22D3A5; font-weight: 600;">✔ CORRECT ANSWER!</span>\n\nAll internal test cases passed successfully!\nRedirecting to Exam Hub...`;
+      output.scrollTop = output.scrollHeight;
+    }
 
-    // Automatically exit in 3 seconds
     startAutoExitCountdown(3);
   }
 
   function renderFailedState() {
     const q = activePool[currentPoolIndex];
-    const userCode = document.getElementById('code-editor').value;
+    const editor = document.getElementById('code-editor');
+    const userCode = editor ? editor.value : '';
 
     const output = document.getElementById('test-console-output');
     const badge = document.getElementById('test-status-badge');
@@ -422,17 +437,16 @@
       badge.style.background = "#f43f5e";
     }
 
-    output.innerHTML = `<span style="color: #f43f5e; font-weight: 600;">✖ INCORRECT SOLUTION (2/2 Attempts Exhausted)!</span>\n\n` +
-      `<span style="color: #f43f5e; font-weight:600;">Your Submission:</span>\n` +
-      `<div style="background: rgba(244,63,94,0.12); color: #f87171; padding: 10px; border-radius: 6px; margin: 6px 0;">${escapeHtml(userCode)}</div>` +
-      `<span style="color: #22d3a5; font-weight:600;">Expected Solution:</span>\n` +
-      `<div style="background: rgba(34,211,165,0.12); color: #34d399; padding: 10px; border-radius: 6px; margin: 6px 0;">${escapeHtml(q.correctSolution)}</div>` +
-      `\n<span style="color: #cbd5e1; font-style: italic;">Redirecting to dashboard automatically...</span>`;
-    
-    // Auto-scroll output container to bottom so the expected answer is fully visible
-    output.scrollTop = output.scrollHeight;
+    if (output) {
+      output.innerHTML = `<span style="color: #f43f5e; font-weight: 600;">✖ INCORRECT SOLUTION (2/2 Attempts Exhausted)!</span>\n\n` +
+        `<span style="color: #f43f5e; font-weight:600;">Your Submission:</span>\n` +
+        `<div style="background: rgba(244,63,94,0.12); color: #f87171; padding: 10px; border-radius: 6px; margin: 6px 0;">${escapeHtml(userCode)}</div>` +
+        `<span style="color: #22d3a5; font-weight:600;">Expected Solution:</span>\n` +
+        `<div style="background: rgba(34,211,165,0.12); color: #34d399; padding: 10px; border-radius: 6px; margin: 6px 0;">${escapeHtml(q.correctSolution)}</div>` +
+        `\n<span style="color: #cbd5e1; font-style: italic;">Redirecting to Exam Hub...</span>`;
+      output.scrollTop = output.scrollHeight;
+    }
 
-    // Automatically exit in 4 seconds
     startAutoExitCountdown(4);
   }
 
@@ -444,10 +458,9 @@
       document.exitFullscreen().catch(() => {});
     }
 
-    window.location.href = 'dashboard.html';
+    window.location.href = 'exam-hub.html';
   };
 
-  /* SWITCH QUESTION LOGIC */
   window.nextQuestion = function () {
     if (questionSwitchesLeft <= 0) {
       alert("You have used all 3 available question switches!");
@@ -506,9 +519,13 @@
 
   function renderCurrentProblem() {
     if (!activePool || activePool.length === 0) {
-      document.getElementById('problem-title').innerText = "Question Coming Soon";
-      document.getElementById('problem-description').innerText = "No unseen problems available for this combination.";
-      document.getElementById('code-editor').value = "// Select another domain or difficulty level";
+      const title = document.getElementById('problem-title');
+      const desc = document.getElementById('problem-description');
+      const editor = document.getElementById('code-editor');
+
+      if (title) title.innerText = "Question Coming Soon";
+      if (desc) desc.innerText = "No unseen problems available for this combination.";
+      if (editor) editor.value = "// Select another domain or difficulty level";
       return;
     }
 
@@ -563,4 +580,658 @@
   function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
+})();
+
+/* ==========================================================================
+   4. APTITUDE TEST & CS ASSESSMENT ENGINE
+   ========================================================================== */
+function getFullCardPastelTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  
+  if (currentTheme === 'dark') {
+    const darkCardPastels = [
+      { bg: 'rgba(56, 53, 90, 0.75)', text: '#d2cffc', border: '#786fa6' },
+      { bg: 'rgba(40, 60, 85, 0.75)', text: '#cce0ff', border: '#546de5' },
+      { bg: 'rgba(85, 45, 40, 0.75)', text: '#fcdcd6', border: '#e15f41' },
+      { bg: 'rgba(80, 50, 65, 0.75)', text: '#fce4ec', border: '#f8a5c2' },
+      { bg: 'rgba(85, 65, 45, 0.75)', text: '#fceddf', border: '#f3a683' },
+      { bg: 'rgba(40, 75, 75, 0.75)', text: '#d4f5f5', border: '#63cdda' }
+    ];
+    return darkCardPastels[Math.floor(Math.random() * darkCardPastels.length)];
+  } else {
+    const lightCardPastels = [
+      { bg: '#f3f2ff', text: '#3f3d56', border: '#a29bfe' },
+      { bg: '#eef6ff', text: '#2c3e50', border: '#74b9ff' },
+      { bg: '#e8f8f5', text: '#114b3e', border: '#55efc4' },
+      { bg: '#fffdf0', text: '#594f00', border: '#ffeaa7' },
+      { bg: '#fff5f5', text: '#5c2222', border: '#fab1a0' },
+      { bg: '#fef0f5', text: '#522238', border: '#fd79a8' }
+    ];
+    return lightCardPastels[Math.floor(Math.random() * lightCardPastels.length)];
+  }
+}
+
+function generateThemePastelPalette(count) {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  let basePalette = currentTheme === 'dark' 
+    ? ['#786fa6', '#546de5', '#e15f41', '#f8a5c2', '#f3a683', '#63cdda', '#ea8685', '#778beb', '#cf6a87']
+    : ['#a29bfe', '#74b9ff', '#81ecec', '#55efc4', '#ffeaa7', '#fab1a0', '#ff7675', '#fd79a8', '#ffeaa7'];
+
+  const dynamicColors = [];
+  for (let i = 0; i < count; i++) {
+    dynamicColors.push(basePalette[(i + Math.floor(Math.random() * 2)) % basePalette.length]);
+  }
+  return dynamicColors;
+}
+
+const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+function generateCSLogicalQuestion(id) {
+  const types = [
+    () => {
+      const p1 = pick(["A", "X", "P", "M"]);
+      const p2 = pick(["B", "Y", "Q", "N"]);
+      const p3 = pick(["C", "Z", "R", "O"]);
+      return {
+        id,
+        category: "Section 1: Logical Reasoning",
+        question_text: `In a process dependency graph, if Task ${p1} depends on Task ${p2}, and Task ${p2} depends on Task ${p3}, what is the topological execution order?`,
+        option_a: `${p3} -> ${p2} -> ${p1}`,
+        option_b: `${p1} -> ${p2} -> ${p3}`,
+        option_c: `${p2} -> ${p1} -> ${p3}`,
+        option_d: `Cyclic deadlock formed`,
+        correct: "A"
+      };
+    },
+    () => {
+      const bitA = rand(8, 15);
+      const bitB = rand(1, 7);
+      const res = bitA ^ bitB;
+      return {
+        id,
+        category: "Section 1: Logical Reasoning",
+        question_text: `What is the output of the bitwise XOR operation (${bitA} ^ ${bitB}) in decimal?`,
+        option_a: `${res}`,
+        option_b: `${bitA + bitB}`,
+        option_c: `${bitA & bitB}`,
+        option_d: `${res + 2}`,
+        correct: "A"
+      };
+    },
+    () => {
+      const terms = ["PUSH", "POP", "PEEK", "ENQUEUE", "DEQUEUE"];
+      const w = pick(terms);
+      const rev = w.split('').reverse().join('');
+      return {
+        id,
+        category: "Section 1: Logical Reasoning",
+        question_text: `If the stack string '${w}' is reversed to form '${rev}', which data structure natively produces this behavior?`,
+        option_a: "LIFO Stack",
+        option_b: "FIFO Queue",
+        option_c: "Priority Queue",
+        option_d: "Circular Linked List",
+        correct: "A"
+      };
+    },
+    () => {
+      const nodes = rand(5, 20);
+      const edges = nodes - 1;
+      return {
+        id,
+        category: "Section 1: Logical Reasoning",
+        question_text: `A connected undirected graph has ${nodes} vertices and contains no cycles. How many edges does it have?`,
+        option_a: `${edges}`,
+        option_b: `${nodes}`,
+        option_c: `${nodes + 1}`,
+        option_d: `${nodes * 2}`,
+        correct: "A"
+      };
+    }
+  ];
+  return pick(types)();
+}
+
+function generateCSVerbalQuestion(id) {
+  const vocab = [
+    { word: "DEPRECATED", correct: "Feature that is discouraged and being phased out", wrong1: "A feature with high security priority", wrong2: "An optimized compiler instruction", wrong3: "A database encryption key" },
+    { word: "IDEMPOTENT", correct: "Operation that produces the same result regardless of execution frequency", wrong1: "Function that executes in O(1) time", wrong2: "Memory pointer that cannot be mutated", wrong3: "Thread that never encounters deadlocks" },
+    { word: "POLYMORPHISM", correct: "Ability of an object to take many forms in OOP", wrong1: "Process of compiling binary files", wrong2: "Allocating heap memory dynamically", wrong3: "Handling asynchronous network sockets" },
+    { word: "ASYNCHRONOUS", correct: "Execution model allowing non-blocking I/O operations", wrong1: "Sequential step-by-step program execution", wrong2: "Parallel computing on multi-core GPU", wrong3: "Strictly synchronized mutex lock" }
+  ];
+  const item = pick(vocab);
+  return {
+    id,
+    category: "Section 2: Verbal & Technical Communication",
+    question_text: `In software engineering terminology, choose the accurate definition of '${item.word}':`,
+    option_a: item.correct,
+    option_b: item.wrong1,
+    option_c: item.wrong2,
+    option_d: item.wrong3,
+    correct: "A"
+  };
+}
+
+function generateCSCoreQuestion(id) {
+  const CS_Puzzles = [
+    () => {
+      const n = rand(10, 100);
+      return {
+        id,
+        category: "Section 3: CS Core & Quantitative Aptitude",
+        question_text: `What is the worst-case time complexity of QuickSort on an already sorted array of size N = ${n}?`,
+        option_a: "O(N^2)",
+        option_b: "O(N log N)",
+        option_c: "O(N)",
+        option_d: "O(1)",
+        correct: "A"
+      };
+    },
+    () => {
+      const pageKB = pick([4, 8, 16]);
+      const memMB = pick([64, 128, 256]);
+      const totalPages = (memMB * 1024) / pageKB;
+      return {
+        id,
+        category: "Section 3: CS Core & Quantitative Aptitude",
+        question_text: `An Operating System uses paging with a page size of ${pageKB} KB. How many page frames exist in ${memMB} MB of physical RAM?`,
+        option_a: `${totalPages} frames`,
+        option_b: `${totalPages / 2} frames`,
+        option_c: `${totalPages * 2} frames`,
+        option_d: `${totalPages + 1024} frames`,
+        correct: "A"
+      };
+    },
+    () => {
+      const rows = rand(100, 500);
+      return {
+        id,
+        category: "Section 3: CS Core & Quantitative Aptitude",
+        question_text: `A binary search tree holds ${rows} keys. What is the maximum height of the tree in the worst case?`,
+        option_a: `${rows - 1}`,
+        option_b: `${Math.floor(Math.log2(rows))}`,
+        option_c: `${rows}`,
+        option_d: `${Math.ceil(rows / 2)}`,
+        correct: "A"
+      };
+    },
+    () => {
+      const port = pick([80, 443, 22, 21, 3306]);
+      const protocolMap = { 80: "HTTP", 443: "HTTPS", 22: "SSH", 21: "FTP", 3306: "MySQL" };
+      return {
+        id,
+        category: "Section 3: CS Core & Quantitative Aptitude",
+        question_text: `Which standard networking protocol operates by default over TCP port ${port}?`,
+        option_a: `${protocolMap[port]}`,
+        option_b: port === 80 ? "HTTPS" : "HTTP",
+        option_c: "UDP Domain Services",
+        option_d: "ICMP Ping Protocol",
+        correct: "A"
+      };
+    }
+  ];
+  return pick(CS_Puzzles)();
+}
+
+function generateFullCSTest() {
+  const testSet = [];
+  for (let i = 1; i <= 10; i++) testSet.push(generateCSLogicalQuestion(i));
+  for (let i = 11; i <= 20; i++) testSet.push(generateCSVerbalQuestion(i));
+  for (let i = 21; i <= 30; i++) testSet.push(generateCSCoreQuestion(i));
+  return testSet;
+}
+
+/* FLASHCARD CONTROLLER */
+let cardCount = 0;
+let currentCardData = null;
+let isCardFlipped = false;
+let currentCardTheme = null;
+
+function loadFlashcard() {
+  cardCount++;
+  currentCardData = generateCSCoreQuestion(cardCount);
+  isCardFlipped = false;
+  currentCardTheme = getFullCardPastelTheme();
+  
+  const wrapper = document.getElementById('flashcard-wrapper');
+  const counterEl = document.getElementById('fc-counter');
+
+  if (counterEl) counterEl.textContent = `Card #${cardCount}`;
+
+  if (wrapper) {
+    wrapper.style.cursor = 'pointer';
+    wrapper.style.minHeight = '240px';
+    wrapper.style.padding = '28px';
+    wrapper.style.borderRadius = '18px';
+    wrapper.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+    wrapper.style.display = 'flex';
+    wrapper.style.flexDirection = 'column';
+    wrapper.style.justifyContent = 'center';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.textAlign = 'center';
+    wrapper.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+    
+    renderCardContent();
+  }
+}
+
+function renderCardContent() {
+  const wrapper = document.getElementById('flashcard-wrapper');
+  if (!wrapper || !currentCardData || !currentCardTheme) return;
+
+  wrapper.style.backgroundColor = currentCardTheme.bg;
+  wrapper.style.border = `2px solid ${currentCardTheme.border}`;
+
+  if (!isCardFlipped) {
+    wrapper.innerHTML = `
+      <div style="font-size: 0.85rem; font-weight: 700; color: ${currentCardTheme.border}; letter-spacing: 0.5px; margin-bottom: 12px; text-transform: uppercase;">
+        ${currentCardData.category}
+      </div>
+      <div style="font-size: 1.25rem; font-weight: 600; line-height: 1.5; color: ${currentCardTheme.text}; margin-bottom: 16px;">
+        ${currentCardData.question_text}
+      </div>
+      <div style="font-size: 0.8rem; opacity: 0.75; font-style: italic; color: ${currentCardTheme.text};">
+        💡 Click card to reveal the answer
+      </div>
+    `;
+  } else {
+    wrapper.innerHTML = `
+      <div style="font-size: 0.85rem; font-weight: 700; color: ${currentCardTheme.border}; letter-spacing: 0.5px; margin-bottom: 10px; text-transform: uppercase;">
+        ✓ Correct Answer
+      </div>
+      <div style="font-size: 1.3rem; font-weight: 700; color: ${currentCardTheme.text}; margin-bottom: 12px;">
+        Option ${currentCardData.correct}: ${currentCardData.option_a}
+      </div>
+      <div style="font-size: 0.9rem; opacity: 0.85; max-width: 90%; line-height: 1.4; color: ${currentCardTheme.text};">
+        Core CS Knowledge Check: Verified concept for your engineering assessment.
+      </div>
+      <div style="font-size: 0.75rem; opacity: 0.65; margin-top: 14px; color: ${currentCardTheme.text};">
+        🔄 Click again to flip back
+      </div>
+    `;
+  }
+}
+
+window.flipCard = function () {
+  isCardFlipped = !isCardFlipped;
+  renderCardContent();
+};
+
+window.nextCard = function (e) {
+  if (e) e.stopPropagation();
+  loadFlashcard();
+};
+
+window.prevCard = function (e) {
+  if (e) e.stopPropagation();
+  loadFlashcard();
+};
+
+window.switchModule = function (moduleType) {
+  const hubSection = document.getElementById('module-hub-view');
+  const flashcardSection = document.getElementById('flashcards-view');
+  const startScreen = document.getElementById('start-screen');
+  const testContainer = document.getElementById('test-container');
+  const resultScreen = document.getElementById('result-screen');
+
+  if (moduleType === 'flashcards') {
+    if (hubSection) hubSection.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'none';
+    if (testContainer) testContainer.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'none';
+    if (flashcardSection) {
+      flashcardSection.style.display = 'block';
+      loadFlashcard();
+    }
+  } else if (moduleType === 'assessment') {
+    if (hubSection) hubSection.style.display = 'none';
+    if (flashcardSection) flashcardSection.style.display = 'none';
+    if (testContainer) testContainer.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'block';
+  } else if (moduleType === 'hub') {
+    if (flashcardSection) flashcardSection.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'none';
+    if (testContainer) testContainer.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'none';
+    if (hubSection) hubSection.style.display = 'block';
+  }
+};
+
+/* PROCTORED APTITUDE EXAM & ANALYTICS ENGINE */
+window.currentUserSession = null;
+
+(function () {
+  let questions = [];
+  let currentIndex = 0;
+  let userAnswers = {};
+  let questionTimeLog = {};
+  let qStartTime = 0;
+  let warningCount = 0;
+  let timeRemaining = 1200;
+  let timerInterval = null;
+  let examStartTime = Date.now();
+
+  const startScreen = document.getElementById('start-screen');
+  const testContainer = document.getElementById('test-container');
+  const questionCard = document.getElementById('question-card');
+  const timerDisplay = document.getElementById('session-timer');
+  const warningDisplay = document.getElementById('warning-counter');
+  const resultScreen = document.getElementById('result-screen');
+
+  window.startAssessment = function() {
+    questions = generateFullCSTest(); 
+    currentIndex = 0;
+    userAnswers = {};
+    questionTimeLog = {};
+    warningCount = 0;
+    timeRemaining = 1200;
+    examStartTime = Date.now();
+
+    if (startScreen) startScreen.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'none';
+    if (testContainer) testContainer.style.display = 'block';
+
+    if (warningDisplay) warningDisplay.textContent = `${warningCount}/3`;
+
+    renderQuestion(currentIndex);
+    startTimer();
+    initProctoring();
+  };
+
+  function recordCurrentQuestionTime() {
+    if (qStartTime > 0 && questions[currentIndex]) {
+      const qId = questions[currentIndex].id;
+      const elapsed = Math.floor((Date.now() - qStartTime) / 1000);
+      questionTimeLog[qId] = (questionTimeLog[qId] || 0) + elapsed;
+    }
+  }
+
+  function renderQuestion(index) {
+    if (!questionCard || !questions[index]) return;
+    
+    qStartTime = Date.now();
+    const q = questions[index];
+    const pastelBadge = generateThemePastelPalette(1)[0];
+    
+    questionCard.innerHTML = `
+      <div class="q-header between" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <span class="pill pill-primary" style="padding: 4px 12px; background: ${pastelBadge}25; color: ${pastelBadge}; border-radius: 12px; font-weight: bold; font-size: 13px;">${q.category}</span>
+        <span class="muted small" style="opacity: 0.7; font-size: 14px;">Question ${index + 1} of ${questions.length}</span>
+      </div>
+      <h3 style="margin: 20px 0; font-size: 18px; line-height: 1.5; font-weight: 600;">${q.question_text}</h3>
+      <div class="options-grid" style="display: flex; flex-direction: column; gap: 12px;">
+        ${['a', 'b', 'c', 'd'].map(opt => `
+          <label class="option-label ${userAnswers[q.id] === opt.toUpperCase() ? 'selected' : ''}" style="padding: 12px 16px; border: 1px solid rgba(128,128,128,0.2); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <input type="radio" name="option" value="${opt.toUpperCase()}" ${userAnswers[q.id] === opt.toUpperCase() ? 'checked' : ''} onchange="selectOption(${q.id}, '${opt.toUpperCase()}')">
+            <span><strong>${opt.toUpperCase()}:</strong> ${q['option_' + opt]}</span>
+          </label>
+        `).join('')}
+      </div>
+      <div style="margin-top: 28px; display: flex; justify-content: space-between;">
+        <button class="btn btn-outline" ${index === 0 ? 'disabled' : ''} id="prev-btn">Previous</button>
+        ${index === questions.length - 1 
+          ? '<button class="btn btn-primary" id="submit-exam-btn">Submit Assessment</button>' 
+          : '<button class="btn btn-primary" id="next-btn">Next Question</button>'}
+      </div>
+    `;
+
+    document.getElementById('prev-btn')?.addEventListener('click', () => {
+      recordCurrentQuestionTime();
+      currentIndex--;
+      renderQuestion(currentIndex);
+    });
+
+    document.getElementById('next-btn')?.addEventListener('click', () => {
+      recordCurrentQuestionTime();
+      currentIndex++;
+      renderQuestion(currentIndex);
+    });
+
+    document.getElementById('submit-exam-btn')?.addEventListener('click', () => {
+      recordCurrentQuestionTime();
+      submitExam('Completed');
+    });
+  }
+
+  window.selectOption = function (qId, optionVal) {
+    userAnswers[qId] = optionVal;
+  };
+
+  function startTimer() {
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timeRemaining--;
+      const mins = Math.floor(timeRemaining / 60);
+      const secs = timeRemaining % 60;
+      if (timerDisplay) {
+        timerDisplay.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      }
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval);
+        recordCurrentQuestionTime();
+        submitExam('Time Expired');
+      }
+    }, 1000);
+  }
+
+  function initProctoring() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && testContainer && testContainer.style.display !== 'none') {
+        warningCount++;
+        if (warningDisplay) warningDisplay.textContent = `${warningCount}/3`;
+        
+        if (warningCount >= 3) {
+          recordCurrentQuestionTime();
+          submitExam('Terminated (Tab Switch Violation)');
+        }
+      }
+    });
+  }
+
+  function submitExam(statusReason) {
+    clearInterval(timerInterval);
+    const totalExamTimeSec = Math.max(1, Math.floor((Date.now() - examStartTime) / 1000));
+
+    const sectionStats = {};
+    let totalCorrect = 0;
+    let totalAttempted = Object.keys(userAnswers).length;
+    let correctTimeSum = 0;
+    let wrongTimeSum = 0;
+    let wrongCount = 0;
+
+    questions.forEach(q => {
+      if (!sectionStats[q.category]) {
+        sectionStats[q.category] = { correct: 0, total: 0 };
+      }
+      sectionStats[q.category].total++;
+
+      const isCorrect = userAnswers[q.id] === q.correct;
+      const spent = questionTimeLog[q.id] || 0;
+
+      if (isCorrect) {
+        sectionStats[q.category].correct++;
+        totalCorrect++;
+        correctTimeSum += spent;
+      } else {
+        wrongTimeSum += spent;
+        wrongCount++;
+      }
+    });
+
+    const totalQuestions = questions.length || 1;
+    const overallPct = ((totalCorrect / totalQuestions) * 100).toFixed(1);
+    
+    const avgCorrectTime = totalCorrect > 0 ? (correctTimeSum / totalCorrect).toFixed(1) : 0;
+    const avgWrongTime = wrongCount > 0 ? (wrongTimeSum / wrongCount).toFixed(1) : 0;
+    const avgTimePerQuestion = (totalExamTimeSec / totalQuestions).toFixed(1);
+
+    window.currentUserSession = {
+      scorePct: overallPct,
+      correctCount: totalCorrect,
+      totalQuestions: totalQuestions,
+      status: statusReason,
+      timeTakenSec: totalExamTimeSec,
+      sectionStats: sectionStats
+    };
+
+    if (testContainer) testContainer.style.display = 'none';
+    if (startScreen) startScreen.style.display = 'none';
+    if (resultScreen) resultScreen.style.display = 'block';
+
+    const marksEl = document.getElementById('rep-marks');
+    const attemptedEl = document.getElementById('rep-attempted');
+    const pctEl = document.getElementById('rep-pct');
+    const timeEl = document.getElementById('rep-time');
+
+    if (marksEl) marksEl.textContent = `${(totalCorrect * 2)} / ${totalQuestions * 2}`;
+    if (attemptedEl) attemptedEl.textContent = `${totalAttempted} / ${totalQuestions}`;
+    if (pctEl) pctEl.textContent = `${overallPct}%`;
+    if (timeEl) timeEl.textContent = `${totalExamTimeSec}s / 20m`;
+
+    const secList = document.getElementById('section-breakdown-list');
+    const secNames = [];
+    const secPercentages = [];
+
+    const sectionColors = generateThemePastelPalette(Object.keys(sectionStats).length);
+
+    if (secList) {
+      secList.innerHTML = '';
+      let idx = 0;
+      Object.entries(sectionStats).forEach(([secName, stat]) => {
+        const secPct = ((stat.correct / stat.total) * 100).toFixed(1);
+        const shortName = secName.split(':')[0];
+        secNames.push(shortName);
+        secPercentages.push(secPct);
+
+        const badgeColor = sectionColors[idx % sectionColors.length];
+        idx++;
+
+        secList.innerHTML += `
+          <div style="margin-bottom: 12px; border-bottom: 1px solid rgba(128,128,128,0.15); padding-bottom: 8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <small style="color: ${badgeColor}; font-weight: bold; font-size: 0.8rem;">${secName}</small>
+              <span style="font-size: 0.9rem; font-weight: bold;">${secPct}%</span>
+            </div>
+            <div style="font-size: 0.85rem; opacity: 0.7; margin-top: 2px;">
+              ${stat.correct} correct out of ${stat.total}
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    renderReportCharts(overallPct, avgCorrectTime, avgWrongTime, avgTimePerQuestion, secNames, secPercentages);
+  }
+
+  function renderReportCharts(overallPct, avgCorrectTime, avgWrongTime, avgSpeedSec, secNames, secPercentages) {
+    if (typeof Chart === 'undefined') return;
+
+    ['overallGaugeChart', 'timeSpentChart', 'speedGaugeChart', 'sectionPercentileChart'].forEach(id => {
+      const chartInstance = Chart.getChart(id);
+      if (chartInstance) chartInstance.destroy();
+    });
+
+    const pastelPrimary = generateThemePastelPalette(1)[0];
+    const pastelSecondary = generateThemePastelPalette(1)[0];
+
+    const gaugeCanvas = document.getElementById('overallGaugeChart');
+    if (gaugeCanvas) {
+      new Chart(gaugeCanvas, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [overallPct, Math.max(0, 100 - overallPct)],
+            backgroundColor: [pastelPrimary, 'rgba(128,128,128,0.15)'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          rotation: -90,
+          circumference: 180,
+          cutout: '75%',
+          plugins: { tooltip: { enabled: true } }
+        }
+      });
+    }
+
+    const timeCanvas = document.getElementById('timeSpentChart');
+    if (timeCanvas) {
+      new Chart(timeCanvas, {
+        type: 'bar',
+        data: {
+          labels: ['Avg Correct (s)', 'Avg Wrong (s)'],
+          datasets: [{
+            data: [avgCorrectTime, avgWrongTime],
+            backgroundColor: [pastelPrimary, pastelSecondary],
+            borderRadius: 6,
+            barThickness: 32
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            y: { beginAtZero: true, grid: { color: 'rgba(128,128,128,0.1)' } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+    }
+
+    const speedCanvas = document.getElementById('speedGaugeChart');
+    if (speedCanvas) {
+      let speedVal = avgSpeedSec <= 20 ? 90 : (avgSpeedSec <= 40 ? 55 : 20);
+      new Chart(speedCanvas, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [speedVal, 100 - speedVal],
+            backgroundColor: [pastelPrimary, 'rgba(128,128,128,0.15)'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          rotation: -90,
+          circumference: 180,
+          cutout: '70%',
+          plugins: { tooltip: { enabled: false } }
+        }
+      });
+    }
+
+    const sectionCanvas = document.getElementById('sectionPercentileChart');
+    if (sectionCanvas) {
+      new Chart(sectionCanvas, {
+        type: 'bar',
+        data: {
+          labels: secNames,
+          datasets: [{
+            label: 'Accuracy %',
+            data: secPercentages,
+            backgroundColor: generateThemePastelPalette(secNames.length),
+            borderRadius: 6
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: { 
+            x: { max: 100, beginAtZero: true, grid: { color: 'rgba(128,128,128,0.1)' } },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('start-assessment-btn');
+    if (btn) {
+      btn.addEventListener('click', window.startAssessment);
+    }
+  });
 })();

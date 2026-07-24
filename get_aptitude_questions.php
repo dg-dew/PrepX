@@ -1,19 +1,30 @@
 <?php
 header('Content-Type: application/json');
-require_once 'db.php';
 
-$sql = "SELECT id, question_text, option_a, option_b, option_c, option_d, category FROM aptitude_questions ORDER BY RAND() LIMIT 10";
-$result = $conn->query($sql);
+// Mock backend endpoint providing structured questions
+$questions = [
+    [
+        "id" => 1,
+        "category" => "Quantitative Aptitude",
+        "question" => "A train 180m long running at 72 km/h crosses a pole in how many seconds?",
+        "options" => ["8 seconds", "9 seconds", "10 seconds", "12 seconds"],
+        "answer" => 1
+    ],
+    [
+        "id" => 2,
+        "category" => "Logical Reasoning",
+        "question" => "If 'A' denotes addition, 'B' denotes multiplication, and 'C' denotes subtraction, what is 5 B 4 A 10 C 6?",
+        "options" => ["20", "24", "28", "18"],
+        "answer" => 1
+    ],
+    [
+        "id" => 3,
+        "category" => "SQL & DBMS",
+        "question" => "Which SQL clause is used to filter records that have aggregate functions applied?",
+        "options" => ["WHERE", "GROUP BY", "HAVING", "ORDER BY"],
+        "answer" => 2
+    ]
+];
 
-$questions = [];
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $questions[] = $row;
-    }
-    echo json_encode(["status" => "success", "questions" => $questions]);
-} else {
-    echo json_encode(["status" => "error", "message" => "No questions found in database."]);
-}
-
-$conn->close();
+echo json_encode(["status" => "success", "data" => $questions]);
 ?>
