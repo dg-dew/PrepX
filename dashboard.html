@@ -34,7 +34,7 @@
   <main class="main">
     <div class="page-head">
       <div>
-        <h1>Good morning, Aarav — <span style="color:var(--accent)">Week 6</span></h1>
+        <h1>Good morning, <span id="userNameDisplay">User</span> — <span style="color:var(--accent)">Week 6</span></h1>
         <p>You're 12 points from your target of 90. Two focus tasks today.</p>
       </div>
       <div class="flex" style="gap:10px;">
@@ -106,6 +106,20 @@
     </div>
   </main>
 </div>
+
 <script src="script.js"></script>
+
+<!-- DYNAMIC USER NAME DISPLAY SCRIPT -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Reads stored name set during login/signup, defaults to "User" if empty
+    const storedName = localStorage.getItem('currentUser') || 'User';
+    const userNameElement = document.getElementById('userNameDisplay');
+    if (userNameElement) {
+      userNameElement.textContent = storedName;
+    }
+  });
+</script>
+
 </body>
 </html>

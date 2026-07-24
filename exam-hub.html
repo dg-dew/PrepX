@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exam Hub · CareerPrepX</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-bg: rgba(18, 18, 24, 0.75);
+      --text-main: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent-cyan: #0088ff;
+      --accent-glow: rgba(0, 136, 255, 0.35);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --nav-bg: rgba(10, 13, 20, 0.8);
+    }
+
+    /* LIGHT MODE STYLES */
+    [data-theme="light"] {
+      --bg-dark: #f8fafc;
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --accent-cyan: #0066cc;
+      --accent-glow: rgba(0, 102, 204, 0.2);
+      --border-color: rgba(0, 0, 0, 0.1);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.3s ease, color 0.3s ease;
+    }
+
+    .bg-glow {
+      position: fixed;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%);
+      top: -250px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .top-nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      border-bottom: 1px solid var(--border-color);
+      backdrop-filter: blur(16px);
+      background: var(--nav-bg);
+    }
+
+    .brand-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .cpx-logo-svg {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 0 10px var(--accent-cyan));
+      transform-origin: center;
+      animation: logoIntro 1.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+    }
+
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      opacity: 0;
+      transform: translateX(-15px);
+      animation: titleReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+    }
+
+    .brand-title span { color: var(--accent-cyan); }
+
+    @keyframes logoIntro {
+      0% { position: fixed; top: 45vh; left: 50vw; transform: translate(-50%, -50%) scale(2.8); z-index: 999; }
+      60% { position: fixed; top: 45vh; left: 50vw; transform: translate(-50%, -50%) scale(2.8); z-index: 999; }
+      100% { position: relative; top: 0; left: 0; transform: translate(0, 0) scale(1); z-index: 1; }
+    }
+
+    @keyframes titleReveal { to { opacity: 1; transform: translateX(0); } }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeIn 0.5s ease 1.7s forwards;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: rgba(0, 136, 255, 0.15);
+      border-color: var(--accent-cyan);
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0088ff, #0044ff);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .hub-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 40px auto 60px auto;
+      padding: 0 24px;
+      opacity: 0;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    .hub-header { text-align: center; margin-bottom: 40px; }
+    .hub-header h1 { font-size: 38px; font-weight: 800; margin-bottom: 8px; color: var(--text-main); }
+    .hub-header p { color: var(--text-muted); font-size: 16px; }
+
+    .mode-tag {
+      display: inline-block;
+      padding: 4px 14px;
+      background: rgba(0, 136, 255, 0.15);
+      border: 1px solid rgba(0, 136, 255, 0.3);
+      color: var(--accent-cyan);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) { .modules-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .modules-grid { grid-template-columns: 1fr; } }
+
+    .module-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(16px);
+      transition: all 0.35s ease;
+    }
+
+    .module-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.2), 0 0 25px var(--accent-glow);
+    }
+
+    .module-icon { font-size: 32px; margin-bottom: 16px; }
+    .module-card h3 { font-size: 20px; font-weight: 700; color: var(--text-main); margin: 0 0 8px 0; }
+    .module-card p { color: var(--text-muted); font-size: 14px; line-height: 1.5; margin: 0 0 24px 0; }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .start-module-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 136, 255, 0.3);
+      background: rgba(0, 136, 255, 0.12);
+      color: var(--accent-cyan);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+
+    .module-card:hover .start-module-btn {
+      background: var(--accent-cyan);
+      color: #fff;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+
+  <!-- Header with Theme Toggle -->
+  <header class="top-nav">
+    <a href="mode-select.html" class="brand-logo-container">
+      <svg class="cpx-logo-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="cpxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0055ff" />
+            <stop offset="100%" stop-color="#00d4ff" />
+          </linearGradient>
+        </defs>
+        <polygon points="100,25 175,60 100,95 25,60" fill="#0b2545" />
+        <polygon points="100,25 175,60 100,68 25,60" fill="#0088ff" />
+        <rect x="160" y="60" width="3" height="35" fill="#0088ff" />
+        <circle cx="161.5" cy="98" r="5" fill="#0088ff" />
+        <path d="M 115 65 A 50 50 0 1 0 115 155" stroke="#0b2545" stroke-width="22" stroke-linecap="round" fill="none" />
+        <path d="M 88 80 L 88 150 M 88 80 L 115 80 A 20 20 0 0 1 115 120 L 88 120" stroke="url(#cpxGradient)" stroke-width="18" stroke-linecap="round" fill="none" />
+        <path d="M 35 155 Q 100 170 170 105" stroke="url(#cpxGradient)" stroke-width="14" stroke-linecap="round" fill="none" />
+        <polygon points="175,100 175,120 155,108" fill="#00d4ff" />
+      </svg>
+      <span class="brand-title">CAREER <span>PREPX</span></span>
+    </a>
+
+    <div class="nav-actions">
+      <!-- Dark/Light Theme Toggle -->
+      <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span> <span id="themeText">Dark</span>
+      </button>
+
+      <div class="user-pill">
+        <div class="avatar" id="avatarInitial">H</div>
+        <span id="navUserName" style="font-size: 14px; font-weight: 600;">Candidate</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="hub-container">
+    <div class="hub-header">
+      <span class="mode-tag">🎯 Exam Mode Active</span>
+      <h1>Proctored Assessment Hub</h1>
+      <p>Select an examination module to begin your timed evaluation.</p>
+    </div>
+
+    <div class="modules-grid">
+      
+      <!-- Aptitude Module -->
+      <div class="module-card">
+        <div>
+          <div class="module-icon">⚡</div>
+          <h3>Aptitude Test</h3>
+          <p>Quant, Logical Reasoning, and Verbal Ability with strict time limits.</p>
+        </div>
+        <div>
+          <div class="card-meta"><span>⏱️ 30 Mins</span><span>📝 25 Qs</span></div>
+          <button class="start-module-btn" onclick="alert('Launching Aptitude...')">Launch Test &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Code Arena (DIRECTLY LINKS TO coding.html) -->
+      <div class="module-card" style="border-color: rgba(0, 136, 255, 0.4);">
+        <div>
+          <div class="module-icon">💻</div>
+          <h3>Code Arena</h3>
+          <p>Real-time proctored IDE with automated unit tests and time metrics.</p>
+        </div>
+        <div>
+          <div class="card-meta"><span>⏱️ 45 Mins</span><span>🧩 3 Problems</span></div>
+          <a href="coding.html" class="start-module-btn">Enter Code Arena &rarr;</a>
+        </div>
+      </div>
+
+      <!-- AI Interview Module -->
+      <div class="module-card">
+        <div>
+          <div class="module-icon">🎤</div>
+          <h3>AI Interview Test</h3>
+          <p>Real-time speech analysis & answer evaluation using STAR structure.</p>
+        </div>
+        <div>
+          <div class="card-meta"><span>🎙️ Audio Enabled</span><span>⏱️ 15 Mins</span></div>
+          <button class="start-module-btn" onclick="alert('Launching Interview...')">Start Interview &rarr;</button>
+        </div>
+      </div>
+
+      <!-- GD Module -->
+      <div class="module-card">
+        <div>
+          <div class="module-icon">🗣️</div>
+          <h3>Group Discussion</h3>
+          <p>Simulated multi-agent discussion evaluating communication leadership.</p>
+        </div>
+        <div>
+          <div class="card-meta"><span>🤖 4 AI Agents</span><span>⏱️ 20 Mins</span></div>
+          <button class="start-module-btn" onclick="alert('Entering GD Room...')">Enter GD &rarr;</button>
+        </div>
+      </div>
+
+      <!-- ATS Screener -->
+      <div class="module-card">
+        <div>
+          <div class="module-icon">📄</div>
+          <h3>Resume ATS Screener</h3>
+          <p>Benchmark resume strength against current tech job descriptions.</p>
+        </div>
+        <div>
+          <div class="card-meta"><span>🔍 340+ Matchers</span><span>📊 Instant Score</span></div>
+          <button class="start-module-btn" onclick="alert('Running ATS Audit...')">Run Screener &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Full Results -->
+      <div class="module-card">
+        <div>
+          <div class="module-icon">📊</div>
+          <h3>Full Result & Analytics</h3>
+          <p>Detailed performance scorecards and weakness heatmaps.</p>
+        </div>
+        <div>
+          <div class="card-meta"><span>📈 Live Cohort Rank</span><span>🎯 Placement Score</span></div>
+          <button class="start-module-btn" onclick="alert('Opening Results...')">View Report &rarr;</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const name = localStorage.getItem('currentUser') || 'Candidate';
+      document.getElementById('navUserName').textContent = name;
+      document.getElementById('avatarInitial').textContent = name.charAt(0).toUpperCase();
+
+      // Load saved theme
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      applyTheme(savedTheme);
+    });
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(newTheme);
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      
+      const icon = document.getElementById('themeIcon');
+      const text = document.getElementById('themeText');
+
+      if (theme === 'light') {
+        icon.textContent = '☀️';
+        text.textContent = 'Light';
+      } else {
+        icon.textContent = '🌙';
+        text.textContent = 'Dark';
+      }
+    }
+  </script>
+
+</body>
+</html>

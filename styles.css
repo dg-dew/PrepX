@@ -1,5 +1,5 @@
 /* 1. Import Inter (Modern, Clean, High-Readability Font) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
   /* 2. Set as main font variable */
@@ -36,6 +36,7 @@ h1, h2, h3, h4, h5, h6 {
   --danger: #ef4444;
   --shadow: 0 10px 40px -12px rgba(108,99,255,0.35);
 }
+
 [data-theme="light"] {
   --bg: #F8FAFC;
   --surface: #FFFFFF;
@@ -191,7 +192,7 @@ footer .container { display: flex; justify-content: space-between; flex-wrap: wr
 .side-nav a:hover { background: var(--surface-2); color: var(--text); }
 .side-nav a.active { background: color-mix(in oklab, var(--primary) 15%, transparent); border-color: color-mix(in oklab, var(--primary) 35%, transparent); color: var(--text); }
 .main { padding: 28px 36px; }
-.page-head { display: flex; align-items: end; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 16px; }
 .page-head h1 { font-size: 30px; }
 .page-head p { color: var(--text-muted); margin-top: 6px; }
 
@@ -221,7 +222,51 @@ footer .container { display: flex; justify-content: space-between; flex-wrap: wr
 [data-theme="light"] .editor { background: #0F172A; }
 .editor-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.03); }
 .editor pre { padding: 16px; color: #cfd6ea; font-family: ui-monospace, Menlo, monospace; font-size: 13px; overflow: auto; min-height: 320px; }
-.select { background: var(--surface); border: 1px solid var(--border); color: var(--text); border-radius: 10px; padding: 6px 10px; font-size: 13px; }
+
+/* Enhanced, Crystal-Clear Select Dropdowns (Domain & Language Selectors) */
+.select { 
+  background-color: var(--surface-2); 
+  border: 1px solid var(--border); 
+  color: var(--text); 
+  border-radius: 10px; 
+  padding: 8px 32px 8px 12px; 
+  font-size: 13px; 
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238A93A6' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: all 0.15s ease-in-out;
+}
+
+.select:hover {
+  border-color: var(--primary);
+  background-color: var(--surface);
+}
+
+.select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 30%, transparent);
+}
+
+/* High-contrast dropdown items */
+.select option {
+  background-color: #0F172A;
+  color: #FFFFFF;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+[data-theme="light"] .select option {
+  background-color: #FFFFFF;
+  color: #0F172A;
+}
+
 .test { display: flex; justify-content: space-between; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; }
 
 /* Progress mini */
@@ -326,4 +371,83 @@ footer .container { display: flex; justify-content: space-between; flex-wrap: wr
   text-transform: uppercase;
   letter-spacing: 0.12em;
   background: var(--surface-2);
+}
+
+/* ==========================================================================
+   FULL-SCREEN CODING ARENA MODE (HIDES SIDEBAR COMPLETELY)
+   ========================================================================== */
+body.coding-mode .sidebar,
+.app.coding-mode .sidebar {
+  display: none !important;
+}
+
+body.coding-mode .app,
+.app.coding-mode {
+  grid-template-columns: 1fr !important;
+  width: 100% !important;
+}
+
+body.coding-mode .main,
+.app.coding-mode .main {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 20px !important;
+}
+
+/* Frozen Page Lockout */
+body.test-locked {
+  user-select: none;
+  pointer-events: none; /* Prevents all clicks, selections, and edits */
+}
+
+/* Glassmorphic Exit Popup */
+.exit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 7, 12, 0.85);
+  backdrop-filter: blur(16px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: auto !important; /* Re-enable clicks inside modal if needed */
+  transition: opacity 0.5s ease;
+}
+
+.exit-modal-overlay.active {
+  opacity: 1;
+}
+
+.exit-modal-card {
+  background: rgba(18, 18, 24, 0.9);
+  border: 1px solid rgba(0, 136, 255, 0.4);
+  box-shadow: 0 0 50px rgba(0, 136, 255, 0.25);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  max-width: 420px;
+  transform: translateY(20px);
+  transition: transform 0.5s ease;
+}
+
+.exit-modal-overlay.active .exit-modal-card {
+  transform: translateY(0);
+}
+
+.esc-key-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 0 rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: monospace;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 16px;
+  margin: 10px 0;
 }

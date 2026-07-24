@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Mode · CareerPrepX</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --card-bg: rgba(18, 18, 24, 0.75);
+      --accent-cyan: #0088ff;
+      --navy-dark: #0a1128;
+      --accent-glow: rgba(0, 136, 255, 0.4);
+    }
+
+    body {
+      background: #07090e;
+      color: #e2e8f0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      margin: 0;
+    }
+
+    /* Ambient Dynamic Blue Glow */
+    .bg-glow {
+      position: fixed;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, rgba(0,0,0,0) 70%);
+      top: -250px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 0;
+      pointer-events: none;
+      animation: pulseGlow 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.3; transform: translateX(-50%) scale(0.9); }
+      100% { opacity: 0.75; transform: translateX(-50%) scale(1.1); }
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 40px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+    }
+
+    /* BRAND LOGO INTRO ANIMATION CONTAINER */
+    .brand-logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      position: relative;
+    }
+
+    /* SVG LOGO MARK */
+    .cpx-logo-svg {
+      width: 44px;
+      height: 44px;
+      filter: drop-shadow(0 0 10px var(--accent-cyan));
+      transform-origin: center;
+      animation: logoIntro 1.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+    }
+
+    /* LOGO NAME ANIMATION (Fades in after logo shifts side) */
+    .brand-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #fff;
+      opacity: 0;
+      transform: translateX(-15px);
+      animation: titleReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.5s forwards;
+    }
+
+    .brand-title span {
+      color: var(--accent-cyan);
+    }
+
+    /* KEYFRAMES FOR LOGO ANIMATION (Center -> Top Left Slide) */
+    @keyframes logoIntro {
+      0% {
+        position: fixed;
+        top: 45vh;
+        left: 50vw;
+        transform: translate(-50%, -50%) scale(2.8);
+        filter: drop-shadow(0 0 25px #0088ff);
+        z-index: 999;
+      }
+      60% {
+        position: fixed;
+        top: 45vh;
+        left: 50vw;
+        transform: translate(-50%, -50%) scale(2.8);
+        filter: drop-shadow(0 0 35px #0088ff);
+        z-index: 999;
+      }
+      100% {
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: translate(0, 0) scale(1);
+        filter: drop-shadow(0 0 10px var(--accent-cyan));
+        z-index: 1;
+      }
+    }
+
+    @keyframes titleReveal {
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 1.7s forwards;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .profile-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0088ff, #0044ff);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    /* Main Container Delay Animation */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 1050px;
+      margin: 50px auto;
+      padding: 0 24px;
+      opacity: 0;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.8s forwards;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    .header-title {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .header-title h1 {
+      font-size: 40px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: linear-gradient(180deg, #ffffff 0%, #a1a1aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Cards Grid */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    .mode-card {
+      position: relative;
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 22px;
+      padding: 38px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(20px);
+    }
+
+    .mode-card:hover {
+      transform: translateY(-8px) scale(1.015);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 136, 255, 0.3);
+    }
+
+    .mode-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+    }
+
+    .badge-practice {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .badge-exam {
+      background: rgba(0, 136, 255, 0.15);
+      color: #0088ff;
+      border: 1px solid rgba(0, 136, 255, 0.3);
+    }
+
+    .mode-card h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #fff;
+    }
+
+    .mode-card p {
+      color: #94a3b8;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px 0;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #cbd5e1;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .start-btn {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-practice {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+
+    .mode-card:hover .btn-practice {
+      background: #3b82f6;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-exam {
+      background: rgba(0, 136, 255, 0.15);
+      color: #0088ff;
+      border: 1px solid rgba(0, 136, 255, 0.3);
+    }
+
+    .mode-card:hover .btn-exam {
+      background: #0088ff;
+      color: #fff;
+      box-shadow: 0 0 25px var(--accent-glow);
+    }
+
+    .info-panel {
+      background: rgba(18, 18, 24, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 18px;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(12px);
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+
+    .info-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-glow"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <a href="javascript:void(0);" class="brand-logo-container">
+      
+      <!-- RECREATED TRANSPARENT LOGO SVG -->
+      <svg class="cpx-logo-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="cpxGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0055ff" />
+            <stop offset="100%" stop-color="#00d4ff" />
+          </linearGradient>
+        </defs>
+        <!-- Graduation Cap Top -->
+        <polygon points="100,25 175,60 100,95 25,60" fill="#0b2545" />
+        <polygon points="100,25 175,60 100,68 25,60" fill="#0088ff" />
+        <rect x="160" y="60" width="3" height="35" fill="#0088ff" />
+        <circle cx="161.5" cy="98" r="5" fill="#0088ff" />
+
+        <!-- C Outer Arc -->
+        <path d="M 115 65 A 50 50 0 1 0 115 155" stroke="#0b2545" stroke-width="22" stroke-linecap="round" fill="none" />
+
+        <!-- P Center Stem & Loop -->
+        <path d="M 88 80 L 88 150 M 88 80 L 115 80 A 20 20 0 0 1 115 120 L 88 120" stroke="url(#cpxGradient)" stroke-width="18" stroke-linecap="round" fill="none" />
+
+        <!-- Upward Arrow Base Curve -->
+        <path d="M 35 155 Q 100 170 170 105" stroke="url(#cpxGradient)" stroke-width="14" stroke-linecap="round" fill="none" />
+        <polygon points="175,100 175,120 155,108" fill="#00d4ff" />
+      </svg>
+
+      <!-- BRAND TEXT REVEAL -->
+      <span class="brand-title">CAREER <span>PREPX</span></span>
+    </a>
+
+    <div class="nav-actions">
+      <div class="profile-chip">
+        <div class="avatar" id="avatarInitial">U</div>
+        <span id="navUserName" style="font-size:14px; font-weight:600;">User</span>
+      </div>
+      <a href="settings.html" class="nav-btn">⚙️ Settings</a>
+      <a href="profile.html" class="nav-btn">👤 Profile</a>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="container">
+    <div class="header-title">
+      <h1>Welcome back, <span id="welcomeName">User</span></h1>
+      <p style="color:#94a3b8;">Select your operational mode to enter your portal.</p>
+    </div>
+
+    <div class="mode-grid">
+      <!-- Practice Mode Card -->
+      <div class="mode-card" onclick="selectMode('practice')">
+        <span class="mode-badge badge-practice">Untimed & Guided</span>
+        <h2>⚡ Practice Mode</h2>
+        <p>Dynamic AI feedback, unlimited hints, step-by-step solutions, and targeted module practice.</p>
+        <ul class="feature-list">
+          <li>✨ Real-time AI explanations & step-by-step guidance</li>
+          <li>💡 Dynamic hint reveal system</li>
+          <li>⏱️ Self-paced practice without timer stress</li>
+        </ul>
+        <button class="start-btn btn-practice">Enter Practice Dashboard &rarr;</button>
+      </div>
+
+      <!-- Exam Mode Card -->
+      <div class="mode-card" onclick="selectMode('exam')">
+        <span class="mode-badge badge-exam">Strict Assessment</span>
+        <h2>🎯 Exam Mode</h2>
+        <p>Direct proctored assessment modules including Aptitude, Code Arena, AI Interviews, and GD simulations.</p>
+        <ul class="feature-list">
+          <li>🎯 Full placement module hub</li>
+          <li>⏳ Proctored environment & strict time limits</li>
+          <li>📊 Cohort ranking and readiness reports</li>
+        </ul>
+        <button class="start-btn btn-exam">Enter Exam Hub &rarr;</button>
+      </div>
+    </div>
+
+    <!-- Bottom Info Panel -->
+    <div class="info-panel">
+      <div class="info-item">
+        <span class="info-label">Active Cohort</span>
+        <span class="info-value">Placement Prep 2026</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Current Readiness</span>
+        <span class="info-value" style="color:#10b981;">85 / 100</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">AI Engine</span>
+        <span class="info-value" style="color:#60a5fa;">● Online & Synced</span>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Get logged in user's name from localStorage
+      const storedName = localStorage.getItem('currentUser') || 'Candidate';
+      
+      // Dynamic profile updates
+      document.getElementById('navUserName').textContent = storedName;
+      document.getElementById('welcomeName').textContent = storedName;
+      document.getElementById('avatarInitial').textContent = storedName.charAt(0).toUpperCase();
+    });
+
+    // Handles redirection based on selected mode
+    function selectMode(mode) {
+      localStorage.setItem('selectedMode', mode);
+      
+      if (mode === 'exam') {
+        // Redirect directly to the Exam Modules Hub
+        window.location.href = "exam-hub.html";
+      } else {
+        // Practice Mode goes to standard Dashboard
+        window.location.href = "dashboard.html";
+      }
+    }
+  </script>
+
+</body>
+</html>

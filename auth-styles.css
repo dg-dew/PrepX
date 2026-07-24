@@ -1,0 +1,324 @@
+/* ==========================================================================
+   AUTHENTICATION PAGE STYLES (CAREERPREPX THEME)
+   ========================================================================== */
+
+/* Main Auth Layout Overlay */
+.auth-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: 
+    radial-gradient(circle at 10% 20%, color-mix(in oklab, var(--primary) 15%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, color-mix(in oklab, var(--accent) 10%, transparent) 0%, transparent 40%),
+    var(--bg);
+}
+
+/* Auth Card Split Screen Shell */
+.auth-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  max-width: 960px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(16px);
+}
+
+/* ==========================================================================
+   LEFT VISUAL PANEL & CAROUSEL
+   ========================================================================== */
+
+.auth-visual {
+  background: linear-gradient(145deg, rgba(108, 99, 255, 0.15) 0%, rgba(0, 212, 255, 0.05) 100%), var(--surface-2);
+  border-right: 1px solid var(--border);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+/* Auto-Rotating Slide Container */
+.carousel-container {
+  position: relative;
+  min-height: 270px;
+  display: flex;
+  align-items: center;
+}
+
+.carousel-slide {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  width: 100%;
+}
+
+.carousel-slide.active {
+  display: block;
+  opacity: 1;
+}
+
+.carousel-slide h2 {
+  font-size: 26px;
+  line-height: 1.2;
+  margin: 16px 0 8px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.carousel-slide p {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Dynamic Component Card Inside Left Panel */
+.readiness-mini-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+/* Indicator Dots */
+.auth-footer-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.auth-footer-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--border);
+  transition: all 0.3s ease;
+}
+
+.auth-footer-dots .dot.active {
+  width: 24px;
+  background: var(--accent);
+}
+
+/* ==========================================================================
+   RIGHT FORM PANEL & INPUTS
+   ========================================================================== */
+
+.auth-form-container {
+  padding: 44px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--surface);
+}
+
+.auth-header h2 {
+  font-size: 24px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.auth-header p {
+  margin-top: 4px;
+  margin-bottom: 24px;
+}
+
+/* Google OAuth Social Button */
+.btn-social {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-social:hover {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+/* Divider Line */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-divider span {
+  padding: 0 12px;
+}
+
+/* Form & Input Fields */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 25%, transparent);
+}
+
+/* Password Helper Hint & Validation Styling */
+.pwd-hint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  line-height: 1.3;
+}
+
+.input-field:invalid:not(:placeholder-shown) {
+  border-color: #ff4d4d;
+}
+
+.input-field:valid:not(:placeholder-shown) {
+  border-color: var(--success);
+}
+
+/* Password Visibility Eye Icon Button */
+.pwd-toggle {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.pwd-toggle:hover {
+  color: var(--text);
+}
+
+/* Form Action Buttons & Links */
+.btn-full {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 14px;
+}
+
+.auth-switch {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 20px;
+}
+
+.auth-switch a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (MOBILE & TABLETS)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .auth-card {
+    grid-template-columns: 1fr;
+  }
+  .auth-visual {
+    display: none;
+  }
+  .auth-form-container {
+    padding: 32px 24px;
+  }
+}
+
+/* Inline OTP Action Buttons */
+.otp-inline-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.otp-inline-btn:hover {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 15%, transparent);
+}
