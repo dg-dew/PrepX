@@ -225,7 +225,7 @@
         <h2 style="font-family: var(--font-heading); font-size: 22px;">🔒 Proctoring Guidelines & Rules</h2>
         <ul class="rules-list">
           <li><strong>Full Screen Mode:</strong> The test must be conducted in full screen. Exiting full screen flags a violation.</li>
-          <li><strong>Tab Switching:</strong> Switching tabs or opening external applications is monitored. Maximum 2 strikes permitted.</li>
+          <li><strong>Tab Switching & ESC Key:</strong> Switching tabs or pressing <kbd style="background:#1e293b; padding:2px 6px; border-radius:4px;">ESC</kbd> triggers an anti-cheat strike. Maximum 2 warnings allowed.</li>
           <li><strong>Automatic Termination:</strong> Reaching 3 strikes results in immediate automatic session submission.</li>
           <li><strong>Timer Strictness:</strong> The 30-minute timer runs continuously and auto-submits upon reaching 00:00.</li>
         </ul>
@@ -383,18 +383,53 @@
       loadQuestion(0);
     }
 
+    // --- PROCTORING SYSTEM WITH ESC + TAB + BLUR + FULLSCREEN LISTENERS ---
     function setupProctoringListeners() {
-      window.onblur = () => handleViolation("Tab switch or loss of window focus detected!");
+      // 1. Tab Switch Detection
       document.onvisibilitychange = () => {
-        if (document.hidden) handleViolation("Navigating away from the exam tab is restricted!");
+        if (isExamActive && document.hidden) {
+          handleViolation("Navigating away from the exam tab is restricted!");
+        }
       };
+
+      // 2. Window Blur / Unfocus
+      window.onblur = () => {
+        if (isExamActive) {
+          handleViolation("Tab switch or loss of window focus detected!");
+        }
+      };
+
+      // 3. ESC Key Listener
+      document.addEventListener('keydown', handleKeyDownTrap);
+
+      // 4. Exit Fullscreen Detection
+      document.addEventListener('fullscreenchange', handleFullscreenChange);
+
+      // Disable drag and copy selection
       document.ondragstart = (e) => e.preventDefault();
       document.onselectstart = (e) => e.preventDefault();
+    }
+
+    function handleKeyDownTrap(e) {
+      if (!isExamActive) return;
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        e.preventDefault();
+        handleViolation("Pressing the ESC key is strictly forbidden during proctored exams!");
+      }
+    }
+
+    function handleFullscreenChange() {
+      if (!isExamActive) return;
+      if (!document.fullscreenElement) {
+        handleViolation("Exiting full-screen mode is a proctoring violation!");
+      }
     }
 
     function removeProctoringListeners() {
       window.onblur = null;
       document.onvisibilitychange = null;
+      document.removeEventListener('keydown', handleKeyDownTrap);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
     }
 
     function handleViolation(reason) {
@@ -406,7 +441,7 @@
       if (strikes >= 3) {
         finishExam("Terminated automatically due to exceeding maximum proctoring violation limit (3 Strikes).");
       } else {
-        document.getElementById('warningText').innerText = `${reason}\nWarning Strike ${strikes} of 3. Reaching 3 strikes will immediately terminate your exam.`;
+        document.getElementById('warningText').innerText = `${reason}\n\nWarning Strike ${strikes} of 3. Reaching 3 strikes will immediately terminate your exam.`;
         document.getElementById('warningModal').style.display = 'flex';
       }
     }
@@ -597,7 +632,7 @@
     }
 
     function resetToSetup() {
-      window.location.href = 'exam-hub.html';
+      window.location.href = 'aptitude.html';
     }
   </script>
 </body>
