@@ -3,347 +3,317 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CareerPrepX — AI Placement Preparation for Engineering Students</title>
+<title>PrepX — AI Placement Preparation for Engineering Students</title>
 <meta name="description" content="AI-powered adaptive aptitude, resume ATS, sandboxed coding, mock interviews, and personalized roadmap. Get placement-ready with confidence." />
 <link rel="stylesheet" href="styles.css" />
+<style>
+  /* --- SPLASH SCREEN ANIMATION STYLES --- */
+  #splash-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: var(--surface, #0f172a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s;
+  }
+
+  #splash-brand-container {
+    position: fixed;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    pointer-events: none;
+    transition: transform 1.1s cubic-bezier(0.65, 0, 0.15, 1);
+    transform-origin: top left;
+  }
+
+  #splash-logo-img {
+    height: 72px; /* Starts big in the center */
+    width: auto;
+    object-fit: contain;
+    opacity: 0;
+    transform: scale(0.3);
+    animation: logoPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s forwards;
+  }
+
+  #splash-text {
+    font-size: 48px;
+    font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--text);
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 0;
+    opacity: 0;
+    animation: textReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
+  }
+
+  #splash-text span {
+    color: var(--accent);
+  }
+
+  @keyframes logoPop {
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes textReveal {
+    0% { max-width: 0; opacity: 0; transform: translateX(-20px); }
+    100% { max-width: 250px; opacity: 1; transform: translateX(0); }
+  }
+
+  /* --- MAIN CONTENT REVEAL STYLES --- */
+  #main-wrapper {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease 2.0s, transform 1s ease 2.0s;
+  }
+
+  #main-wrapper.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hides the real navbar logo until the animation finishes flying in */
+  #nav-brand-target {
+    visibility: hidden; 
+  }
+</style>
 </head>
 <body>
-    
 
-<header class="nav">
-  <div class="nav-inner">
-    <a href="index.html" class="brand"><span class="brand-mark">C</span> Career<span style="color:var(--accent)">PrepX</span></a>
-    <nav class="nav-links">
-      <a href="#features">Features</a>
-      <a href="#how">How It Works</a>
-      <a href="#interview">Mock Interview</a>
-      <a href="#recruiters">Recruiters</a>
-    </nav>
-    <div class="nav-actions">
-      <button class="theme-toggle" data-theme-toggle><span data-theme-label>☀ Light</span></button>
-      <a href="login.html" class="btn btn-primary">Get Started</a>
-    </div>
-  </div>
-</header>
+<!-- SPLASH SCREEN OVERLAY -->
+<div id="splash-overlay"></div>
+<div id="splash-brand-container">
+  <img src="logo.png" id="splash-logo-img" alt="PrepX Logo" />
+  <div id="splash-text">Prep<span>X</span></div>
+</div>
 
-<main>
-  <!-- HERO -->
-  <section class="hero container">
-    <div class="hero-grid">
-      <div>
-        <span class="pill pill-primary">◆ AI-Powered Placement OS</span>
-        <h1 style="margin-top:16px;">You're more ready than you think. <span class="grad">Let's prove it.</span></h1>
-        <p class="lead">CareerPrepX is the adaptive prep platform built for final-year engineering students — aptitude, resume, coding, interviews and a personalized roadmap, all evaluated by AI trained on real recruiter benchmarks.</p>
-        <div class="hero-ctas">
-          <a href="login.html" class="btn btn-primary">Start Free Assessment →</a>
-          <a href="#how" class="btn btn-ghost">See how it works</a>
-        </div>
-        <div style="display:flex; gap:24px; margin-top:28px; color:var(--text-muted); font-size:13px;">
-          <span>✓ No credit card</span>
-          <span>✓ 14-day free trial</span>
-          <span>✓ College-partner ready</span>
-        </div>
-      </div>
-
-      <div class="panel readiness-card">
-        <div class="between" style="margin-bottom:14px;">
-          <div>
-            <div class="tiny">Placement Readiness</div>
-            <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;margin-top:4px;">Aarav Sharma · Week 6</div>
-          </div>
-          <span class="pill pill-success">● Live</span>
-        </div>
-        <div class="ring">
-          <svg width="180" height="180" viewBox="0 0 180 180">
-            <circle cx="90" cy="90" r="76" stroke="var(--surface-2)" stroke-width="14" fill="none"/>
-            <circle cx="90" cy="90" r="76" stroke="url(#g)" stroke-width="14" fill="none"
-              stroke-dasharray="477" stroke-dashoffset="72" stroke-linecap="round"/>
-            <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6C63FF"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs>
-          </svg>
-          <div class="num">85</div>
-        </div>
-        <div class="stat-row">
-          <div class="stat"><div class="v">92</div><div class="l">ATS Score</div></div>
-          <div class="stat"><div class="v">Top 8%</div><div class="l">Coding Rank</div></div>
-          <div class="stat"><div class="v">87%</div><div class="l">Confidence</div></div>
-        </div>
+<!-- MAIN WEBSITE CONTENT -->
+<div id="main-wrapper">
+  <header class="nav">
+    <div class="nav-inner">
+      <!-- Nav Target for Animation -->
+      <a href="index.html" class="brand" id="nav-brand-target" style="display: flex; align-items: center; gap: 8px;">
+        <img src="logo.png" alt="PrepX Logo" style="height: 36px; width: auto; object-fit: contain;" />
+        <span>Prep<span style="color:var(--accent)">X</span></span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How It Works</a>
+        <a href="#interview">Mock Interview</a>
+        <a href="#recruiters">Recruiters</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-toggle" data-theme-toggle><span data-theme-label>☀ Light</span></button>
+        <a href="login.html" class="btn btn-primary">Get Started</a>
       </div>
     </div>
+  </header>
 
-    <!-- STAT STRIP -->
-    <div class="strip">
-      <div class="item"><div class="num">12,000+</div><div class="lbl">Students Prepared</div></div>
-      <div class="item"><div class="num">94%</div><div class="lbl">Placement Rate</div></div>
-      <div class="item"><div class="num">340+</div><div class="lbl">Hiring Partners</div></div>
-      <div class="item"><div class="num">4.9 / 5</div><div class="lbl">Student Rating</div></div>
-    </div>
-    <div style="text-align:center; color:var(--text-muted); font-size:13px; letter-spacing:.15em; text-transform:uppercase;">Trusted by teams at</div>
-    <div style="display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin-top:14px; color:var(--text-muted); font-family:'Space Grotesk'; font-weight:600;">
-      <span>CHRIST University</span><span>VIT</span><span>BITS Pilani</span><span>NIT Trichy</span><span>SRM</span><span>Manipal</span>
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section id="features" class="section">
-    <div class="container">
-      <div class="section-head">
-        <span class="pill pill-accent">The Platform</span>
-        <h2 style="margin-top:12px;">Everything you need to land the offer</h2>
-        <p>Six connected modules that adapt to your weak zones and rebuild your confidence with real, recruiter-grade signal.</p>
-      </div>
-
-      <div class="bento">
-        <div class="panel b-1">
-          <div class="feature-icon">⚡</div>
-          <h3>Adaptive Aptitude Engine</h3>
-          <p class="muted small" style="margin-top:6px;">Bandit-driven MCQ engine that shifts difficulty in real time across Quant, LR, Verbal, and DI.</p>
-          <div class="code" style="margin-top:14px;">
-<span class="c">// difficulty step</span><br/>
-<span class="k">const</span> next = engine.pick({<br/>
-&nbsp;&nbsp;topic: <span class="s">'time-speed-distance'</span>,<br/>
-&nbsp;&nbsp;streak: 4, accuracy: 0.82,<br/>
-});
-          </div>
-        </div>
-
-        <div class="panel b-2">
-          <div class="feature-icon">📄</div>
-          <h3>Resume ATS Checker</h3>
-          <p class="muted small" style="margin-top:6px;">Parses your resume, scores it against 340+ JD templates, and returns exact keyword and section fixes.</p>
-          <div style="margin-top:16px; display:flex; align-items:center; gap:16px;">
-            <div style="font-family:'Space Grotesk';font-size:44px;font-weight:700;">92<span style="font-size:18px;color:var(--text-muted);">/100</span></div>
-            <div style="flex:1;">
-              <div class="metric-row"><span class="lbl">Skills</span><div class="bar"><i style="width:94%"></i></div><span class="val">94</span></div>
-              <div class="metric-row"><span class="lbl">Experience</span><div class="bar"><i style="width:88%"></i></div><span class="val">88</span></div>
-              <div class="metric-row"><span class="lbl">Formatting</span><div class="bar"><i style="width:96%"></i></div><span class="val">96</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel b-3">
-          <div class="feature-icon">⌨</div>
-          <h3>Sandboxed Coding Arena</h3>
-          <p class="muted small" style="margin-top:6px;">Isolated runtime, 12 languages, hidden test cases, and per-problem complexity feedback.</p>
-          <div style="margin-top:14px; display:flex; flex-wrap:wrap; gap:6px;">
-            <span class="pill">Python</span><span class="pill">C++</span><span class="pill">Java</span><span class="pill">JS</span><span class="pill">Go</span>
-          </div>
-        </div>
-
-        <div class="panel b-4">
-          <div class="feature-icon">🎤</div>
-          <h3>AI Interviewer</h3>
-          <p class="muted small" style="margin-top:6px;">Voice + text interviewer scoring Confidence, Clarity and Depth using STAR analysis.</p>
-          <div class="metric-row"><span class="lbl">Confidence</span><div class="bar"><i style="width:87%"></i></div><span class="val">87</span></div>
-          <div class="metric-row"><span class="lbl">Clarity</span><div class="bar"><i style="width:79%"></i></div><span class="val">79</span></div>
-          <div class="metric-row"><span class="lbl">Depth</span><div class="bar"><i style="width:83%"></i></div><span class="val">83</span></div>
-        </div>
-
-        <div class="panel b-5">
-          <div class="feature-icon">🗺</div>
-          <h3>Personalized Roadmap</h3>
-          <p class="muted small" style="margin-top:6px;">A 10-week plan that rebuilds itself weekly around your gaps and target companies.</p>
-          <div style="display:flex; gap:6px; margin-top:14px;">
-            <span class="badge" style="background:var(--success);color:#001;">W1</span>
-            <span class="badge" style="background:var(--success);color:#001;">W2</span>
-            <span class="badge" style="background:var(--success);color:#001;">W3</span>
-            <span class="badge" style="background:var(--success);color:#001;">W4</span>
-            <span class="badge" style="background:var(--success);color:#001;">W5</span>
-            <span class="badge" style="border-color:var(--accent);color:var(--accent);">W6</span>
-            <span class="badge">W7</span><span class="badge">W8</span><span class="badge">W9</span><span class="badge">W10</span>
-          </div>
-        </div>
-
-        <div class="panel b-6">
-          <div class="feature-icon">◎</div>
-          <h3>Placement Readiness Score</h3>
-          <p class="muted small" style="margin-top:6px;">One number recruiters trust — computed across aptitude, coding, resume, and interview signals.</p>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;">
-            <div class="stat"><div class="v">85</div><div class="l">Overall</div></div>
-            <div class="stat"><div class="v">88</div><div class="l">Aptitude</div></div>
-            <div class="stat"><div class="v">82</div><div class="l">Coding</div></div>
-            <div class="stat"><div class="v">87</div><div class="l">Interview</div></div>
-          </div>
-        </div>
-
-        <div class="panel b-7">
-          <div class="feature-icon">🏢</div>
-          <h3>Recruiter Portal</h3>
-          <p class="muted small" style="margin-top:6px;">Verified candidate pipeline with score-based filtering for TPOs and enterprise recruiters.</p>
-          <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
-            <span class="pill pill-primary">Score ≥ 80</span>
-            <span class="pill pill-accent">CSE 2027</span>
-            <span class="pill">Available Jul 2026</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOW IT WORKS -->
-  <section id="how" class="section" style="background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
-    <div class="container">
-      <div class="section-head">
-        <span class="pill pill-primary">How It Works</span>
-        <h2 style="margin-top:12px;">From baseline to offer in 10 weeks</h2>
-      </div>
-      <div class="hiw">
-        <div class="steps">
-          <div class="step"><div class="n">1</div><div><h4>Baseline Assessment</h4><p>90-minute diagnostic across aptitude, coding, and communication.</p></div></div>
-          <div class="step"><div class="n">2</div><div><h4>Personalized Roadmap</h4><p>AI generates your 10-week plan targeting your dream companies.</p></div></div>
-          <div class="step"><div class="n">3</div><div><h4>Daily Adaptive Practice</h4><p>Bandit engine picks the exact next problem you need.</p></div></div>
-          <div class="step"><div class="n">4</div><div><h4>Weekly Mock Interviews</h4><p>AI + peer mocks with STAR-framework feedback.</p></div></div>
-          <div class="step"><div class="n">5</div><div><h4>Recruiter Match</h4><p>Verified profile pushed to 340+ hiring partners.</p></div></div>
-        </div>
-        <div class="panel">
-          <div class="between" style="margin-bottom:14px;">
-            <div class="tiny">Dashboard Preview</div>
-            <span class="pill pill-success">On track</span>
-          </div>
-          <div class="mini">
-            <div class="stat"><div class="v">85</div><div class="l">Readiness</div></div>
-            <div class="stat"><div class="v">14</div><div class="l">Day Streak</div></div>
-            <div class="stat"><div class="v">92</div><div class="l">ATS</div></div>
-          </div>
-          <div style="margin-top:16px;">
-            <div class="metric-row"><span class="lbl">Aptitude</span><div class="bar"><i style="width:88%"></i></div><span class="val">88</span></div>
-            <div class="metric-row"><span class="lbl">Coding</span><div class="bar"><i style="width:74%"></i></div><span class="val">74</span></div>
-            <div class="metric-row"><span class="lbl">Interview</span><div class="bar"><i style="width:87%"></i></div><span class="val">87</span></div>
-            <div class="metric-row"><span class="lbl">Resume</span><div class="bar"><i style="width:92%"></i></div><span class="val">92</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- INTERVIEW PREVIEW -->
-  <section id="interview" class="section">
-    <div class="container">
-      <div class="section-head">
-        <span class="pill pill-accent">AI Mock Interview</span>
-        <h2 style="margin-top:12px;">Rehearse the questions that decide the offer</h2>
-      </div>
-      <div class="hiw">
-        <div class="panel">
-          <div class="between" style="margin-bottom:14px;">
-            <div class="tiny">Behavioral · Round 2 of 3</div>
-            <span class="pill pill-primary">● Recording</span>
-          </div>
-          <div class="chat">
-            <div class="bubble ai">
-              <div class="who">AI Interviewer</div>
-              Tell me about a time you led a team through a technical setback. What did you own, and what did you change afterward?
-            </div>
-            <div class="bubble me">
-              <div class="who">You</div>
-              During our capstone, our ML pipeline started failing 30% of test batches two weeks before demo. I owned triage — I reproduced it on a smaller dataset, isolated a data-drift issue in feature scaling, and rewrote the preprocessing step. We shipped on time and I added a validation gate so we'd catch drift automatically after that.
-            </div>
-            <div class="bubble ai">
-              <div class="who">STAR Feedback</div>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px;">
-                <div class="stat"><div class="v" style="color:var(--success)">A+</div><div class="l">Situation</div></div>
-                <div class="stat"><div class="v" style="color:var(--success)">A</div><div class="l">Task</div></div>
-                <div class="stat"><div class="v" style="color:var(--accent)">A</div><div class="l">Action</div></div>
-                <div class="stat"><div class="v" style="color:var(--warning)">B+</div><div class="l">Result</div></div>
-              </div>
-              <p class="muted small" style="margin-top:10px;">Quantify the result next time — e.g. "reduced failure rate from 30% to 2%".</p>
-            </div>
-          </div>
-        </div>
-        <div class="panel">
-          <h3>Session Metrics</h3>
-          <p class="muted small" style="margin-top:4px;">Live signal from voice cadence, semantic depth, and STAR alignment.</p>
-          <div style="margin-top:16px;">
-            <div class="metric-row"><span class="lbl">Confidence</span><div class="bar"><i style="width:87%"></i></div><span class="val">87</span></div>
-            <div class="metric-row"><span class="lbl">Delivery</span><div class="bar"><i style="width:81%"></i></div><span class="val">81</span></div>
-            <div class="metric-row"><span class="lbl">Clarity</span><div class="bar"><i style="width:79%"></i></div><span class="val">79</span></div>
-            <div class="metric-row"><span class="lbl">Depth</span><div class="bar"><i style="width:83%"></i></div><span class="val">83</span></div>
-            <div class="metric-row"><span class="lbl">Structure</span><div class="bar"><i style="width:90%"></i></div><span class="val">90</span></div>
-          </div>
-          <div style="margin-top:20px; padding-top:20px; border-top:1px solid var(--border);">
-            <div class="tiny">Suggestions</div>
-            <ul style="margin-top:10px; padding-left: 18px; color:var(--text-muted); font-size:14px; line-height:1.9;">
-              <li>Anchor answers with a numeric outcome.</li>
-              <li>Reduce filler words — "kind of", "like".</li>
-              <li>Front-load the action in each STAR block.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECRUITERS -->
-  <section id="recruiters" class="section" style="background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
-    <div class="container">
-      <div class="section-head">
-        <span class="pill pill-primary">For Recruiters &amp; TPOs</span>
-        <h2 style="margin-top:12px;">Hire from a verified, ranked pipeline</h2>
-      </div>
-      <div class="hiw">
+  <main>
+    <!-- HERO -->
+    <section class="hero container">
+      <div class="hero-grid">
         <div>
-          <ul style="list-style:none; display:grid; gap:12px;">
-            <li class="step"><div class="n">✓</div><div><h4>Verified Readiness Scores</h4><p>Every candidate scored across four independent AI signals.</p></div></li>
-            <li class="step"><div class="n">✓</div><div><h4>Filter by exact fit</h4><p>Score range, domain, availability, campus and CGPA in one query.</p></div></li>
-            <li class="step"><div class="n">✓</div><div><h4>Recorded interview clips</h4><p>Preview 60-second behavioral clips before you schedule.</p></div></li>
-            <li class="step"><div class="n">✓</div><div><h4>ATS-ready exports</h4><p>Bulk export as CSV or push directly to Greenhouse, Lever, or Workday.</p></div></li>
-          </ul>
+          <span class="pill pill-primary">◆ AI-Powered Placement OS</span>
+          <h1 style="margin-top:16px;">You're more ready than you think. <span class="grad">Let's prove it.</span></h1>
+          <p class="lead">PrepX is the adaptive prep platform built for final-year engineering students — aptitude, resume, coding, interviews and a personalized roadmap, all evaluated by AI trained on real recruiter benchmarks.</p>
+          <div class="hero-ctas">
+            <a href="login.html" class="btn btn-primary">Start Free Assessment →</a>
+            <a href="#how" class="btn btn-ghost">See how it works</a>
+          </div>
+          <div style="display:flex; gap:24px; margin-top:28px; color:var(--text-muted); font-size:13px;">
+            <span>✓ No credit card</span>
+            <span>✓ 14-day free trial</span>
+            <span>✓ College-partner ready</span>
+          </div>
         </div>
-        <div class="panel" style="padding:0; overflow:hidden;">
-          <table class="table">
-            <thead><tr><th>Candidate</th><th>Score</th><th>Coding</th><th>Interview</th></tr></thead>
-            <tbody>
-              <tr><td>Aarav Sharma</td><td><span class="pill pill-success">85</span></td><td>Top 8%</td><td>87</td></tr>
-              <tr><td>Priya Nair</td><td><span class="pill pill-success">91</span></td><td>Top 3%</td><td>92</td></tr>
-              <tr><td>Rohan Mehta</td><td><span class="pill pill-primary">78</span></td><td>Top 14%</td><td>81</td></tr>
-              <tr><td>Sana Kapoor</td><td><span class="pill pill-success">88</span></td><td>Top 6%</td><td>85</td></tr>
-              <tr><td>Kiran Devi</td><td><span class="pill pill-warning">72</span></td><td>Top 22%</td><td>74</td></tr>
-            </tbody>
-          </table>
+
+        <div class="panel readiness-card">
+          <div class="between" style="margin-bottom:14px;">
+            <div>
+              <div class="tiny">Placement Readiness</div>
+              <div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;margin-top:4px;">Aarav Sharma · Week 6</div>
+            </div>
+            <span class="pill pill-success">● Live</span>
+          </div>
+          <div class="ring">
+            <svg width="180" height="180" viewBox="0 0 180 180">
+              <circle cx="90" cy="90" r="76" stroke="var(--surface-2)" stroke-width="14" fill="none"/>
+              <circle cx="90" cy="90" r="76" stroke="url(#g)" stroke-width="14" fill="none"
+                stroke-dasharray="477" stroke-dashoffset="72" stroke-linecap="round"/>
+              <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6C63FF"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs>
+            </svg>
+            <div class="num">85</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><div class="v">92</div><div class="l">ATS Score</div></div>
+            <div class="stat"><div class="v">Top 8%</div><div class="l">Coding Rank</div></div>
+            <div class="stat"><div class="v">87%</div><div class="l">Confidence</div></div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- TESTIMONIALS -->
-  <section class="section">
+      <!-- STAT STRIP -->
+      <div class="strip">
+        <div class="item"><div class="num">12,000+</div><div class="lbl">Students Prepared</div></div>
+        <div class="item"><div class="num">94%</div><div class="lbl">Placement Rate</div></div>
+        <div class="item"><div class="num">340+</div><div class="lbl">Hiring Partners</div></div>
+        <div class="item"><div class="num">4.9 / 5</div><div class="lbl">Student Rating</div></div>
+      </div>
+      <div style="text-align:center; color:var(--text-muted); font-size:13px; letter-spacing:.15em; text-transform:uppercase;">Trusted by teams at</div>
+      <div style="display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin-top:14px; color:var(--text-muted); font-family:'Space Grotesk'; font-weight:600;">
+        <span>CHRIST University</span><span>VIT</span><span>BITS Pilani</span><span>NIT Trichy</span><span>SRM</span><span>Manipal</span>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section-head">
+          <span class="pill pill-accent">The Platform</span>
+          <h2 style="margin-top:12px;">Everything you need to land the offer</h2>
+          <p>Six connected modules that adapt to your weak zones and rebuild your confidence with real, recruiter-grade signal.</p>
+        </div>
+
+        <div class="bento">
+          <div class="panel b-1">
+            <div class="feature-icon">⚡</div>
+            <h3>Adaptive Aptitude Engine</h3>
+            <p class="muted small" style="margin-top:6px;">Bandit-driven MCQ engine that shifts difficulty in real time across Quant, LR, Verbal, and DI.</p>
+          </div>
+
+          <div class="panel b-2">
+            <div class="feature-icon">📄</div>
+            <h3>Resume ATS Checker</h3>
+            <p class="muted small" style="margin-top:6px;">Parses your resume, scores it against 340+ JD templates, and returns exact keyword and section fixes.</p>
+            <div style="margin-top:16px; display:flex; align-items:center; gap:16px;">
+              <div style="font-family:'Space Grotesk';font-size:44px;font-weight:700;">92<span style="font-size:18px;color:var(--text-muted);">/100</span></div>
+              <div style="flex:1;">
+                <div class="metric-row"><span class="lbl">Skills</span><div class="bar"><i style="width:94%"></i></div><span class="val">94</span></div>
+                <div class="metric-row"><span class="lbl">Experience</span><div class="bar"><i style="width:88%"></i></div><span class="val">88</span></div>
+                <div class="metric-row"><span class="lbl">Formatting</span><div class="bar"><i style="width:96%"></i></div><span class="val">96</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel b-3">
+            <div class="feature-icon">⌨</div>
+            <h3>Sandboxed Coding Arena</h3>
+            <p class="muted small" style="margin-top:6px;">Isolated runtime, 12 languages, hidden test cases, and per-problem complexity feedback.</p>
+          </div>
+
+          <div class="panel b-4">
+            <div class="feature-icon">🎤</div>
+            <h3>AI Interviewer</h3>
+            <p class="muted small" style="margin-top:6px;">Voice + text interviewer scoring Confidence, Clarity and Depth using STAR analysis.</p>
+          </div>
+
+          <div class="panel b-5">
+            <div class="feature-icon">🗺</div>
+            <h3>Personalized Roadmap</h3>
+            <p class="muted small" style="margin-top:6px;">A 10-week plan that rebuilds itself weekly around your gaps and target companies.</p>
+          </div>
+
+          <div class="panel b-6">
+            <div class="feature-icon">◎</div>
+            <h3>Placement Readiness Score</h3>
+            <p class="muted small" style="margin-top:6px;">One number recruiters trust — computed across aptitude, coding, resume, and interview signals.</p>
+          </div>
+
+          <div class="panel b-7">
+            <div class="feature-icon">🏢</div>
+            <h3>Recruiter Portal</h3>
+            <p class="muted small" style="margin-top:6px;">Verified candidate pipeline with score-based filtering for TPOs and enterprise recruiters.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section id="how" class="section" style="background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+      <div class="container">
+        <div class="section-head">
+          <span class="pill pill-primary">How It Works</span>
+          <h2 style="margin-top:12px;">From baseline to offer in 10 weeks</h2>
+        </div>
+        <div class="hiw">
+          <div class="steps">
+            <div class="step"><div class="n">1</div><div><h4>Baseline Assessment</h4><p>90-minute diagnostic across aptitude, coding, and communication.</p></div></div>
+            <div class="step"><div class="n">2</div><div><h4>Personalized Roadmap</h4><p>AI generates your 10-week plan targeting your dream companies.</p></div></div>
+            <div class="step"><div class="n">3</div><div><h4>Daily Adaptive Practice</h4><p>Bandit engine picks the exact next problem you need.</p></div></div>
+            <div class="step"><div class="n">4</div><div><h4>Weekly Mock Interviews</h4><p>AI + peer mocks with STAR-framework feedback.</p></div></div>
+            <div class="step"><div class="n">5</div><div><h4>Recruiter Match</h4><p>Verified profile pushed to 340+ hiring partners.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
     <div class="container">
-      <div class="section-head">
-        <h2>What students are saying</h2>
-      </div>
-      <div class="grid" style="grid-template-columns:repeat(3,1fr);">
-        <div class="panel"><p>"CareerPrepX called out gaps in my resume that six mock rounds missed. Got shortlisted at 4 product companies in a month."</p><div style="margin-top:14px;color:var(--text-muted);font-size:13px;">— Nikhil R., CSE '26 · Amazon SDE-1</div></div>
-        <div class="panel"><p>"The adaptive aptitude is unreal — it stopped wasting my time on topics I already knew and drilled the weak ones."</p><div style="margin-top:14px;color:var(--text-muted);font-size:13px;">— Meera S., ECE '26 · Accenture</div></div>
-        <div class="panel"><p>"The STAR feedback after every mock is what actually moved my interview scores from 60s to 90s."</p><div style="margin-top:14px;color:var(--text-muted);font-size:13px;">— Arjun P., ISE '26 · Microsoft</div></div>
-      </div>
+      <div>© 2026 PrepX — Built for the next generation of engineers.</div>
+      <div style="display:flex; gap:20px;"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
     </div>
-  </section>
-
-  <!-- CTA -->
-  <section class="section">
-    <div class="container">
-      <div class="panel" style="text-align:center; padding:56px 24px; background:linear-gradient(135deg, color-mix(in oklab, var(--primary) 18%, var(--surface)), color-mix(in oklab, var(--accent) 12%, var(--surface)));">
-        <h2>Your placement season starts today.</h2>
-        <p class="muted" style="max-width:560px; margin:12px auto 24px;">Take the 90-minute baseline and get your Placement Readiness Score. Free forever for the first module.</p>
-        <a class="btn btn-primary" href="login.html">Start Free Baseline →</a>
-      </div>
-    </div>
-  </section>
-</main>
-
-<footer>
-  <div class="container">
-    <div>© 2026 CareerPrepX — Built for the next generation of engineers.</div>
-    <div style="display:flex; gap:20px;"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
-  </div>
-</footer>
+  </footer>
+</div>
 
 <script src="script.js"></script>
+
+<!-- SPLASH SCREEN ANIMATION LOGIC -->
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const overlay = document.getElementById('splash-overlay');
+    const brandContainer = document.getElementById('splash-brand-container');
+    const mainWrapper = document.getElementById('main-wrapper');
+    const target = document.getElementById('nav-brand-target');
+
+    // 1. Center the logo and text initially
+    const windowWidth = window.innerWidth;
+    const windowHeight = window.innerHeight;
+    
+    // Adjusting these offsets so it visually centers perfectly
+    brandContainer.style.top = (windowHeight / 2 - 36) + 'px'; 
+    brandContainer.style.left = (windowWidth / 2 - 100) + 'px';
+
+    // 2. Wait for the pop & reveal animations to play, then fly to the corner
+    setTimeout(() => {
+      const targetRect = target.getBoundingClientRect();
+      const containerRect = brandContainer.getBoundingClientRect();
+
+      // Calculate the exact distance to the top left navbar target
+      const deltaX = targetRect.left - containerRect.left;
+      const deltaY = targetRect.top - containerRect.top;
+
+      // The target logo in the header is 36px, the splash one is 72px. So scale down by 0.5
+      brandContainer.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(0.5)`;
+
+      // 3. Fade out the dark background overlay shortly after movement begins
+      setTimeout(() => {
+        overlay.style.opacity = '0';
+        
+        // Unhide real navbar logo, hide the flying clone, fade in the website
+        setTimeout(() => {
+          overlay.style.visibility = 'hidden';
+          target.style.visibility = 'visible';
+          brandContainer.style.display = 'none';
+        }, 800);
+        
+        mainWrapper.classList.add('visible');
+      }, 400);
+
+    }, 2200); // Amount of time the intro stays in the center before flying
+  });
+</script>
 
 <div id="chat-button">💬</div>
 
 <div id="chat-popup">
     <div id="chat-header">
-        <span>CareerPrepX AI </span>
+        <span>PrepX AI </span>
         <button id="close-chat">✖</button>
     </div>
 
