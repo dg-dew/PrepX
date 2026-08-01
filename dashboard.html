@@ -6,6 +6,7 @@
 <title>Dashboard · PrepX</title>
 <meta name="description" content="Your personalized placement dashboard — readiness score, streaks, and module progress." />
 <link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="chatbot-widget.css" />
 </head>
 <body>
 <div class="app">
@@ -127,6 +128,19 @@
     }
   });
 </script>
+
+<!-- ECHO CHATBOT WIDGET -->
+<div id="echo-chat-widget">
+  <div id="echo-chat-panel">
+    <div id="echo-chat-header">
+      <span>💬 Echo Assistant</span>
+      <button id="echo-chat-close" aria-label="Close chat">✕</button>
+    </div>
+    <div id="echo-chat-loading">Loading Echo…</div>
+  </div>
+  <button id="echo-chat-toggle" aria-label="Open chat assistant">💬</button>
+</div>
+<script src="chatbot-widget.js"></script>
 
 </body>
 </html>
