@@ -6,6 +6,8 @@
 <title>Recruiter Dashboard · CareerPrepX</title>
 <meta name="description" content="Verified candidate pipeline with score-based filtering for enterprise recruiters." />
 <link rel="stylesheet" href="styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 </head>
 <body>
 <div class="app">
@@ -19,6 +21,7 @@
       <a href="interview.html">🎤 Mock Interview</a>
       <a href="recruiter.html" class="active">🏢 Recruiter Portal</a>
       <a href="index.html">← Back to site</a>
+      <a href="#" onclick="signOutAndRedirect(); return false;">⎋ Sign Out</a>
     </nav>
     <div style="margin-top:20px;"><button class="theme-toggle" data-theme-toggle style="width:100%;justify-content:center;"><span data-theme-label>☀ Light</span></button></div>
   </aside>
@@ -140,5 +143,10 @@
   </main>
 </div>
 <script src="script.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    await requireAuth(); // sends to login.html if not signed in
+  });
+</script>
 </body>
 </html>

@@ -7,6 +7,8 @@
 <meta name="description" content="Your personalized placement dashboard — readiness score, streaks, and module progress." />
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="chatbot-widget.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 </head>
 <body>
 <div class="app">
@@ -27,6 +29,7 @@
       <a href="interview.html">🎤 Mock Interview</a>
       <a href="recruiter.html">🏢 Recruiter Portal</a>
       <a href="index.html">← Back to site</a>
+      <a href="#" onclick="signOutAndRedirect(); return false;">⎋ Sign Out</a>
     </nav>
     <div class="panel" style="margin-top:20px;">
       <div class="tiny">Placement Readiness</div>
@@ -117,14 +120,18 @@
 
 <script src="script.js"></script>
 
-<!-- DYNAMIC USER NAME DISPLAY SCRIPT -->
+<!-- DYNAMIC USER NAME DISPLAY SCRIPT (now backed by Supabase, not localStorage) -->
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    // Reads stored name set during login/signup, defaults to "User" if empty
-    const storedName = localStorage.getItem('currentUser') || 'User';
+  document.addEventListener('DOMContentLoaded', async () => {
+    const user = await requireAuth(); // kicks back to login.html if not signed in
+    if (!user) return;
+
+    const profile = await getCurrentProfile();
+    const displayName = profile?.full_name || user.email?.split('@')[0] || 'User';
+
     const userNameElement = document.getElementById('userNameDisplay');
     if (userNameElement) {
-      userNameElement.textContent = storedName;
+      userNameElement.textContent = displayName;
     }
   });
 </script>

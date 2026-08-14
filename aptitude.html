@@ -443,6 +443,8 @@
       .arena-workspace { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -587,6 +589,10 @@
 
   <!-- SCRIPT -->
   <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await requireAuth(); // sends to login.html if not signed in
+    });
+
     let selectedDomain = 'cs';
     let selectedDiff = 'easy';
 

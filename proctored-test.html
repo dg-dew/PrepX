@@ -175,6 +175,8 @@
       .exam-workspace { grid-template-columns: 1fr; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -311,6 +313,10 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await requireAuth(); // sends to login.html if not signed in
+    });
+
     let selectedDiff = 'easy';
     let examQuestions = [];
     let currentQsIdx = 0;
@@ -567,6 +573,21 @@
       document.getElementById('resCorrect').innerText = correctCount;
       document.getElementById('resWrong').innerText = wrongCount;
       document.getElementById('resStrikes').innerText = strikes;
+
+      // Save this attempt to Supabase so it shows up in the user's history
+      const timeTakenSeconds = 1800 - secondsLeft;
+      const scorePct = attemptedCount > 0 ? Math.round((correctCount / 50) * 100) : 0;
+
+      saveAptitudeResult({
+        score_percentage: scorePct,
+        correct_count: correctCount,
+        total_questions: 50,
+        time_taken: timeTakenSeconds,
+        warnings_count: strikes,
+        status: reasonMsg
+      }).then(({ error }) => {
+        if (error) console.error('Could not save aptitude result:', error);
+      });
 
       showResultPage();
     }

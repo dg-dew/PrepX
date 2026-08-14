@@ -139,6 +139,8 @@
       100% { transform: scale(1); opacity: 1; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -154,6 +156,7 @@
         <a href="aptitude.html">Aptitude Test</a>
         <a href="coding.html" class="active">Coding Arena</a>
         <a href="resume.html">Resume Analyzer</a>
+        <a href="#" onclick="signOutAndRedirect(); return false;">⎋ Sign Out</a>
       </nav>
     </aside>
 
@@ -392,6 +395,10 @@
   <script src="script.js"></script>
   
   <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      await requireAuth(); // sends to login.html if not signed in
+    });
+
     // Direct fallback handlers for malpractice or manual exits
     function quitCodingMode() {
       window.location.href = 'exam-hub.html';

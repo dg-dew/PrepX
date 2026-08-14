@@ -10,8 +10,9 @@
   <!-- EmailJS SDK -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   
-  <!-- Google Identity Services Library -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -366,11 +367,25 @@
       }
     }
 
-    // SAVES NAME & REDIRECTS TO MODE SELECT PAGE
-    function handleFormSubmit(e) {
+    // If already logged in (e.g. bounced back here after Google OAuth,
+    // or revisiting login.html with an active session), skip straight in.
+    (async function redirectIfLoggedIn() {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session) window.location.href = "mode-select.html";
+    })();
+
+    function setSubmitLoading(isLoading, label) {
+      const submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = isLoading;
+      submitBtn.innerText = isLoading ? "Please wait..." : label;
+    }
+
+    // SIGNS UP OR SIGNS IN VIA SUPABASE, THEN REDIRECTS TO MODE SELECT
+    async function handleFormSubmit(e) {
       e.preventDefault();
 
-      let displayName = "";
+      const email = document.getElementById('emailInput').value.trim();
+      const password = document.getElementById('passwordInput').value;
 
       if (isSignUpMode) {
         if (!validatePasswordMatch()) {
@@ -382,54 +397,62 @@
           return;
         }
 
-        const enteredName = document.getElementById('fullNameInput').value.trim();
-        displayName = enteredName ? enteredName : "User";
-      } else {
-        const emailInput = document.getElementById('emailInput').value.trim();
-        if (emailInput) {
-          const prefix = emailInput.split('@')[0];
-          displayName = prefix.charAt(0).toUpperCase() + prefix.slice(1);
-        } else {
-          displayName = "User";
-        }
-      }
+        const fullName = document.getElementById('fullNameInput').value.trim() || "User";
+        setSubmitLoading(true, "Create Account →");
 
-      // Store name globally in localStorage
-      localStorage.setItem('currentUser', displayName);
-
-      // Redirect to Mode Selection page
-      window.location.href = "mode-select.html";
-    }
-
-    // GOOGLE SIGN IN & REDIRECT TO MODE SELECT
-    function triggerGoogleSignIn() {
-      if (typeof google !== 'undefined' && google.accounts) {
-        const client = google.accounts.oauth2.initTokenClient({
-          client_id: '264303295962-s31sbb0j7c4omh7phv5k3sh5thp0cge2.apps.googleusercontent.com',
-          scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-          callback: (response) => {
-            if (response.access_token) {
-              fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                headers: { Authorization: `Bearer ${response.access_token}` }
-              })
-              .then(res => res.json())
-              .then(data => {
-                const googleName = data.given_name || data.name || "Google User";
-                localStorage.setItem('currentUser', googleName);
-                window.location.href = 'mode-select.html';
-              })
-              .catch(() => {
-                localStorage.setItem('currentUser', 'User');
-                window.location.href = 'mode-select.html';
-              });
-            }
-          },
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName } // stored in auth.users metadata, copied to profiles by the DB trigger
+          }
         });
-        client.requestAccessToken();
+
+        setSubmitLoading(false, "Create Account →");
+
+        if (error) {
+          alert("Sign up failed: " + error.message);
+          return;
+        }
+
+        // If your Supabase project still has "Confirm email" turned ON,
+        // there will be no session yet — tell the user to check their inbox.
+        if (!data.session) {
+          alert("Account created! Please check your email to confirm your account, then sign in.");
+          toggleAuthMode();
+          return;
+        }
+
+        window.location.href = "mode-select.html";
+
       } else {
-        localStorage.setItem('currentUser', 'User');
+        setSubmitLoading(true, "Sign In →");
+
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        setSubmitLoading(false, "Sign In →");
+
+        if (error) {
+          alert("Sign in failed: " + error.message);
+          return;
+        }
+
         window.location.href = "mode-select.html";
       }
+    }
+
+    // GOOGLE SIGN IN VIA SUPABASE OAUTH — redirects to Google, then back here
+    async function triggerGoogleSignIn() {
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + window.location.pathname.replace('login.html', 'mode-select.html')
+        }
+      });
+      if (error) {
+        alert("Google sign-in failed: " + error.message);
+      }
+      // On success, Supabase redirects the browser away — nothing more to do here.
     }
   </script>
 </body>

@@ -250,6 +250,8 @@
       box-shadow: 0 0 20px var(--accent-glow);
     }
   </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
 </head>
 <body>
 
@@ -287,6 +289,8 @@
         <div class="avatar" id="avatarInitial">H</div>
         <span id="navUserName" style="font-size: 14px; font-weight: 600;">Candidate</span>
       </div>
+
+      <button class="theme-toggle-btn" onclick="signOutAndRedirect()">⎋ Sign Out</button>
     </div>
   </header>
 
@@ -381,8 +385,12 @@
   </main>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const name = localStorage.getItem('currentUser') || 'Candidate';
+    document.addEventListener('DOMContentLoaded', async () => {
+      const user = await requireAuth(); // kicks back to login.html if not signed in
+      if (!user) return;
+
+      const profile = await getCurrentProfile();
+      const name = profile?.full_name || user.email?.split('@')[0] || 'Candidate';
       document.getElementById('navUserName').textContent = name;
       document.getElementById('avatarInitial').textContent = name.charAt(0).toUpperCase();
 
