@@ -33,8 +33,8 @@
         <p>Analyzed against 340+ recruiter JD templates for the SDE role family.</p>
       </div>
       <div class="flex" style="gap:10px;">
-        <button class="btn btn-outline">Change JD</button>
-        <button class="btn btn-primary">Rescan Resume</button>
+        <button class="btn btn-outline" id="changeJDBtn">Change JD</button>
+        <button class="btn btn-primary" id="rescanBtn">Rescan Resume</button>
       </div>
     </div>
 
@@ -44,8 +44,8 @@
           <div style="font-size:36px;">⇪</div>
           <h3 style="margin-top:8px;">Drag &amp; drop your resume</h3>
           <p class="muted small" style="margin-top:6px;">PDF or DOCX, up to 5MB — parsed on your device.</p>
-          <input type="file" accept=".pdf,.docx" style="margin-top:14px;" />
-          <div class="muted small" style="margin-top:10px;">Currently analyzing: <strong style="color:var(--text);">Aarav_Sharma_Resume_v4.pdf</strong></div>
+          <input type="file" id="resumeFileInput" accept=".pdf,.docx" style="margin-top:14px;" />
+          <div class="muted small" style="margin-top:10px;">Currently analyzing: <strong id="currentFileName" style="color:var(--text);">Aarav_Sharma_Resume_v4.pdf</strong></div>
         </div>
 
         <div class="panel">
@@ -67,34 +67,34 @@
       <div class="grid" style="gap:20px; align-content:start;">
         <div class="panel" style="text-align:center;">
           <div class="tiny">ATS Score</div>
-          <div class="ring" style="margin-top:12px;">
+          <div class="ring" style="margin-top:12px; position:relative; display:inline-block;">
             <svg width="180" height="180" viewBox="0 0 180 180">
               <circle cx="90" cy="90" r="76" stroke="var(--surface-2)" stroke-width="14" fill="none"/>
               <circle cx="90" cy="90" r="76" stroke="url(#g2)" stroke-width="14" fill="none" stroke-dasharray="477" stroke-dashoffset="38" stroke-linecap="round"/>
               <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#22D3A5"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs>
             </svg>
-            <div class="num">92</div>
+            <div class="num" id="atsScoreNum" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:38px; font-weight:bold;">92</div>
           </div>
-          <p class="muted small" style="margin-top:8px;">Passes 8 of 10 filters at Amazon, Google, and Microsoft.</p>
+          <p class="muted small" style="margin-top:8px;" id="atsPassText">Passes 8 of 10 filters at Amazon, Google, and Microsoft.</p>
         </div>
 
         <div class="panel">
           <h3>Keyword Match</h3>
           <div style="margin-top:14px;">
             <div class="tiny">Found (24)</div>
-            <div class="kw" style="margin-top:8px;">
+            <div class="kw" id="foundKeywordsContainer" style="margin-top:8px;">
               <span class="pill pill-success">Python</span><span class="pill pill-success">Java</span><span class="pill pill-success">System Design</span>
               <span class="pill pill-success">REST</span><span class="pill pill-success">SQL</span><span class="pill pill-success">CI/CD</span>
               <span class="pill pill-success">Docker</span><span class="pill pill-success">AWS</span><span class="pill pill-success">Git</span>
             </div>
             <div class="tiny" style="margin-top:16px;">Missing (5)</div>
-            <div class="kw" style="margin-top:8px;">
+            <div class="kw" id="missingKeywordsContainer" style="margin-top:8px;">
               <span class="pill pill-danger">Kubernetes</span><span class="pill pill-danger">GraphQL</span>
               <span class="pill pill-danger">Terraform</span><span class="pill pill-danger">gRPC</span>
               <span class="pill pill-danger">Kafka</span>
             </div>
             <div class="tiny" style="margin-top:16px;">Suggested to add (4)</div>
-            <div class="kw" style="margin-top:8px;">
+            <div class="kw" id="suggestedKeywordsContainer" style="margin-top:8px;">
               <span class="pill pill-accent">TypeScript</span><span class="pill pill-accent">Redis</span>
               <span class="pill pill-accent">Observability</span><span class="pill pill-accent">Load Testing</span>
             </div>
@@ -107,7 +107,7 @@
 <script src="script.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
-    await requireAuth(); // sends to login.html if not signed in
+    await requireAuth(); 
   });
 </script>
 </body>
