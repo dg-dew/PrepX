@@ -8,6 +8,26 @@
 <link rel="stylesheet" href="styles.css" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
+<!-- Client-side file parsers: PDF text extraction + DOCX text extraction -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.7.0/mammoth.browser.min.js"></script>
+<style>
+  .jd-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:100; }
+  .jd-modal-backdrop.open { display:flex; }
+  .jd-modal { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:24px; width:min(560px,92vw); max-height:86vh; overflow:auto; }
+  .jd-modal h3 { margin-bottom:6px; }
+  .jd-modal textarea { width:100%; min-height:220px; margin-top:12px; padding:12px; border-radius:10px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-family:inherit; font-size:14px; resize:vertical; }
+  .jd-modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:16px; }
+  .status-msg { margin-top:10px; font-size:13px; padding:10px 12px; border-radius:10px; display:none; }
+  .status-msg.show { display:block; }
+  .status-msg.err { background:color-mix(in oklab, var(--danger) 14%, transparent); color:var(--danger); border:1px solid color-mix(in oklab, var(--danger) 40%, transparent); }
+  .status-msg.ok { background:color-mix(in oklab, var(--success) 14%, transparent); color:var(--success); border:1px solid color-mix(in oklab, var(--success) 40%, transparent); }
+  .status-msg.info { background:color-mix(in oklab, var(--primary) 12%, transparent); color:var(--text); border:1px solid var(--border); }
+  .drop.dragover { border-color:var(--primary); background:var(--surface-2); }
+  .btn[disabled] { opacity:0.5; pointer-events:none; }
+  .spin { display:inline-block; width:14px; height:14px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:6px; vertical-align:-2px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+</style>
 </head>
 <body>
 <div class="app">
@@ -30,35 +50,31 @@
     <div class="page-head">
       <div>
         <h1>Resume ATS Checker</h1>
-        <p>Analyzed against 340+ recruiter JD templates for the SDE role family.</p>
+        <p id="jdSummaryText">No job description set yet — click "Change JD" to add one.</p>
       </div>
       <div class="flex" style="gap:10px;">
         <button class="btn btn-outline" id="changeJDBtn">Change JD</button>
-        <button class="btn btn-primary" id="rescanBtn">Rescan Resume</button>
+        <button class="btn btn-primary" id="rescanBtn">Analyze Resume</button>
       </div>
     </div>
 
     <div class="grid" style="grid-template-columns:1.1fr 1fr; gap:20px;">
       <div class="grid" style="gap:20px; align-content:start;">
-        <div class="drop">
+        <div class="drop" id="dropZone">
           <div style="font-size:36px;">⇪</div>
           <h3 style="margin-top:8px;">Drag &amp; drop your resume</h3>
           <p class="muted small" style="margin-top:6px;">PDF or DOCX, up to 5MB — parsed on your device.</p>
           <input type="file" id="resumeFileInput" accept=".pdf,.docx" style="margin-top:14px;" />
-          <div class="muted small" style="margin-top:10px;">Currently analyzing: <strong id="currentFileName" style="color:var(--text);">Aarav_Sharma_Resume_v4.pdf</strong></div>
+          <div class="muted small" style="margin-top:10px;">Currently analyzing: <strong id="currentFileName" style="color:var(--text);">No file uploaded yet</strong></div>
+          <div class="status-msg" id="statusMsg"></div>
         </div>
 
         <div class="panel">
           <h3>Section Audit</h3>
           <table class="table" style="margin-top:10px;">
             <thead><tr><th>Section</th><th>Status</th><th>Suggestion</th></tr></thead>
-            <tbody>
-              <tr><td>Contact Info</td><td><span class="pill pill-success">Complete</span></td><td class="muted">Add LinkedIn URL shortener</td></tr>
-              <tr><td>Summary</td><td><span class="pill pill-success">Strong</span></td><td class="muted">Keep to 3 lines</td></tr>
-              <tr><td>Skills</td><td><span class="pill pill-warning">Improve</span></td><td class="muted">Group by category (Languages / Frameworks / Cloud)</td></tr>
-              <tr><td>Experience</td><td><span class="pill pill-success">Strong</span></td><td class="muted">Front-load metrics</td></tr>
-              <tr><td>Projects</td><td><span class="pill pill-warning">Improve</span></td><td class="muted">Add measurable outcomes to 2 of 3 projects</td></tr>
-              <tr><td>Education</td><td><span class="pill pill-success">Complete</span></td><td class="muted">—</td></tr>
+            <tbody id="sectionAuditBody">
+              <tr><td colspan="3" class="muted small">Upload a resume to see section-level feedback.</td></tr>
             </tbody>
           </table>
         </div>
@@ -70,45 +86,356 @@
           <div class="ring" style="margin-top:12px; position:relative; display:inline-block;">
             <svg width="180" height="180" viewBox="0 0 180 180">
               <circle cx="90" cy="90" r="76" stroke="var(--surface-2)" stroke-width="14" fill="none"/>
-              <circle cx="90" cy="90" r="76" stroke="url(#g2)" stroke-width="14" fill="none" stroke-dasharray="477" stroke-dashoffset="38" stroke-linecap="round"/>
+              <circle id="scoreArc" cx="90" cy="90" r="76" stroke="url(#g2)" stroke-width="14" fill="none" stroke-dasharray="477" stroke-dashoffset="477" stroke-linecap="round"/>
               <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#22D3A5"/><stop offset="1" stop-color="#00D4FF"/></linearGradient></defs>
             </svg>
-            <div class="num" id="atsScoreNum" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:38px; font-weight:bold;">92</div>
+            <div class="num" id="atsScoreNum" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:38px; font-weight:bold;">--</div>
           </div>
-          <p class="muted small" style="margin-top:8px;" id="atsPassText">Passes 8 of 10 filters at Amazon, Google, and Microsoft.</p>
+          <p class="muted small" style="margin-top:8px;" id="atsPassText">Upload a resume and set a job description to get scored.</p>
         </div>
 
         <div class="panel">
           <h3>Keyword Match</h3>
           <div style="margin-top:14px;">
-            <div class="tiny">Found (24)</div>
-            <div class="kw" id="foundKeywordsContainer" style="margin-top:8px;">
-              <span class="pill pill-success">Python</span><span class="pill pill-success">Java</span><span class="pill pill-success">System Design</span>
-              <span class="pill pill-success">REST</span><span class="pill pill-success">SQL</span><span class="pill pill-success">CI/CD</span>
-              <span class="pill pill-success">Docker</span><span class="pill pill-success">AWS</span><span class="pill pill-success">Git</span>
-            </div>
-            <div class="tiny" style="margin-top:16px;">Missing (5)</div>
-            <div class="kw" id="missingKeywordsContainer" style="margin-top:8px;">
-              <span class="pill pill-danger">Kubernetes</span><span class="pill pill-danger">GraphQL</span>
-              <span class="pill pill-danger">Terraform</span><span class="pill pill-danger">gRPC</span>
-              <span class="pill pill-danger">Kafka</span>
-            </div>
-            <div class="tiny" style="margin-top:16px;">Suggested to add (4)</div>
-            <div class="kw" id="suggestedKeywordsContainer" style="margin-top:8px;">
-              <span class="pill pill-accent">TypeScript</span><span class="pill pill-accent">Redis</span>
-              <span class="pill pill-accent">Observability</span><span class="pill pill-accent">Load Testing</span>
-            </div>
+            <div class="tiny">Found (<span id="foundCount">0</span>)</div>
+            <div class="kw" id="foundKeywordsContainer" style="margin-top:8px;"></div>
+            <div class="tiny" style="margin-top:16px;">Missing (<span id="missingCount">0</span>)</div>
+            <div class="kw" id="missingKeywordsContainer" style="margin-top:8px;"></div>
+            <div class="tiny" style="margin-top:16px;">Suggested to add (<span id="suggestedCount">0</span>)</div>
+            <div class="kw" id="suggestedKeywordsContainer" style="margin-top:8px;"></div>
           </div>
         </div>
       </div>
     </div>
   </main>
 </div>
+
+<!-- Job description modal -->
+<div class="jd-modal-backdrop" id="jdModalBackdrop">
+  <div class="jd-modal">
+    <h3>Paste the job description</h3>
+    <p class="muted small">This is matched against your resume text to compute keyword coverage.</p>
+    <textarea id="jdTextarea" placeholder="Paste the full job description here..."></textarea>
+    <div class="jd-modal-actions">
+      <button class="btn btn-outline" id="jdCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="jdSaveBtn">Save JD</button>
+    </div>
+  </div>
+</div>
+
 <script src="script.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', async () => {
-    await requireAuth(); 
+document.addEventListener('DOMContentLoaded', async () => {
+  await requireAuth();
+  loadLatestScan();
+});
+
+// ------------------------------------------------------------
+// State
+// ------------------------------------------------------------
+let currentJD = localStorage.getItem('prepx_jd_text') || '';
+let currentResumeText = '';
+let currentFileName = '';
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('resumeFileInput');
+const statusMsg = document.getElementById('statusMsg');
+const jdModalBackdrop = document.getElementById('jdModalBackdrop');
+const jdTextarea = document.getElementById('jdTextarea');
+const jdSummaryText = document.getElementById('jdSummaryText');
+const rescanBtn = document.getElementById('rescanBtn');
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+function showStatus(text, type) {
+  statusMsg.textContent = text;
+  statusMsg.className = 'status-msg show ' + type;
+}
+function clearStatus() {
+  statusMsg.className = 'status-msg';
+}
+
+function updateJDSummary() {
+  if (currentJD.trim()) {
+    const words = currentJD.trim().split(/\s+/).length;
+    jdSummaryText.textContent = `Job description set (${words} words). Click "Change JD" to update it.`;
+  } else {
+    jdSummaryText.textContent = 'No job description set yet — click "Change JD" to add one.';
+  }
+}
+updateJDSummary();
+
+// ------------------------------------------------------------
+// JD modal
+// ------------------------------------------------------------
+document.getElementById('changeJDBtn').addEventListener('click', () => {
+  jdTextarea.value = currentJD;
+  jdModalBackdrop.classList.add('open');
+});
+document.getElementById('jdCancelBtn').addEventListener('click', () => {
+  jdModalBackdrop.classList.remove('open');
+});
+document.getElementById('jdSaveBtn').addEventListener('click', () => {
+  currentJD = jdTextarea.value.trim();
+  localStorage.setItem('prepx_jd_text', currentJD);
+  updateJDSummary();
+  jdModalBackdrop.classList.remove('open');
+  clearStatus();
+});
+
+// ------------------------------------------------------------
+// File upload (click + drag & drop)
+// ------------------------------------------------------------
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files[0]) handleFile(e.target.files[0]);
+});
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+async function handleFile(file) {
+  const validTypes = ['.pdf', '.docx'];
+  const ext = '.' + file.name.split('.').pop().toLowerCase();
+  if (!validTypes.includes(ext)) {
+    showStatus('Please upload a PDF or DOCX file.', 'err');
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    showStatus('File is too large — please keep it under 5MB.', 'err');
+    return;
+  }
+
+  showStatus('Reading your resume...', 'info');
+  document.getElementById('currentFileName').textContent = file.name;
+
+  try {
+    currentResumeText = ext === '.pdf' ? await extractPdfText(file) : await extractDocxText(file);
+    currentFileName = file.name;
+
+    if (!currentResumeText.trim()) {
+      showStatus('Could not extract any text from that file. If it is a scanned/image PDF, try exporting a text-based version.', 'err');
+      return;
+    }
+
+    clearStatus();
+    showStatus(`Parsed "${file.name}" successfully. Click "Analyze Resume" to score it.`, 'ok');
+  } catch (err) {
+    console.error(err);
+    showStatus('Something went wrong reading that file: ' + err.message, 'err');
+  }
+}
+
+async function extractPdfText(file) {
+  const buffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map(item => item.str).join(' ') + '\n';
+  }
+  return text;
+}
+
+async function extractDocxText(file) {
+  const buffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer: buffer });
+  return result.value;
+}
+
+// ------------------------------------------------------------
+// ATS scoring (ported from the old PHP keyword-matcher logic)
+// ------------------------------------------------------------
+const STOP_WORDS = new Set(['and','the','to','a','of','in','for','is','on','with','an','as','by','at','this','that','from','or','are','be','our','you','your']);
+const TECH_KEYWORDS = new Set(['python','java','javascript','typescript','react','node','sql','aws','azure','gcp','docker','kubernetes','graphql','terraform','grpc','kafka','redis','git','ci','cd','microservices','system','design','observability','testing','api','rest','django','flask','spring','mongodb','postgresql','mysql','linux','agile','scrum']);
+
+function cleanWords(text) {
+  return (text || '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function analyzeResume(jobDesc, resumeText) {
+  const jdWords = new Set(cleanWords(jobDesc));
+  const resumeWords = new Set(cleanWords(resumeText));
+
+  const keyJdWords = [...jdWords].filter(w => !STOP_WORDS.has(w));
+
+  if (keyJdWords.length === 0) {
+    return { score: 0, matchLevel: 'POOR', matched: [], missing: [] };
+  }
+
+  const matched = keyJdWords.filter(w => resumeWords.has(w));
+  const missing = keyJdWords.filter(w => !resumeWords.has(w));
+
+  const baseCount = keyJdWords.length;
+  const matchCount = matched.length;
+  const score = Math.min(98, Math.max(15, Math.round((matchCount / baseCount) * 100) + 25));
+
+  const matchLevel = score >= 75 ? 'EXCELLENT' : (score >= 45 ? 'MODERATE' : 'POOR');
+
+  return {
+    score,
+    matchLevel,
+    matched: [...new Set(matched)],
+    missing: [...new Set(missing)]
+  };
+}
+
+function auditSections(resumeText) {
+  const t = resumeText.toLowerCase();
+  const checks = [
+    { name: 'Contact Info', test: /@[\w.-]+\.\w+/.test(resumeText) || /\b\d{10}\b/.test(resumeText.replace(/[^\d]/g, m => m)), tipOk: 'Add LinkedIn URL for extra credibility', tipMissing: 'Add an email and phone number' },
+    { name: 'Summary', test: /(summary|objective|profile)\b/.test(t), tipOk: 'Keep it to 2–3 lines', tipMissing: 'Add a short professional summary at the top' },
+    { name: 'Skills', test: /\bskills\b/.test(t), tipOk: 'Group by category (Languages / Frameworks / Cloud)', tipMissing: 'Add a dedicated Skills section' },
+    { name: 'Experience', test: /(experience|internship|employment)\b/.test(t), tipOk: 'Front-load metrics in bullet points', tipMissing: 'Add a Work Experience / Internship section' },
+    { name: 'Projects', test: /\bprojects?\b/.test(t), tipOk: 'Add measurable outcomes to each project', tipMissing: 'Add a Projects section with 2–3 entries' },
+    { name: 'Education', test: /\beducation\b/.test(t), tipOk: '—', tipMissing: 'Add an Education section' },
+  ];
+  return checks.map(c => ({
+    name: c.name,
+    ok: c.test,
+    suggestion: c.test ? c.tipOk : c.tipMissing
+  }));
+}
+
+function renderPills(containerId, words, pillClass) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  words.forEach(w => {
+    const span = document.createElement('span');
+    span.className = 'pill ' + pillClass;
+    span.textContent = w;
+    el.appendChild(span);
   });
+}
+
+function renderResults(result) {
+  const { score, matched, missing } = result;
+
+  document.getElementById('atsScoreNum').textContent = score;
+  const circumference = 477;
+  const offset = circumference - (circumference * score / 100);
+  document.getElementById('scoreArc').style.strokeDashoffset = offset;
+
+  const passText = score >= 75
+    ? 'Strong match — likely to clear most ATS filters.'
+    : score >= 45
+    ? 'Moderate match — add a few missing keywords to improve odds.'
+    : 'Weak match — this resume needs targeted keyword updates for this JD.';
+  document.getElementById('atsPassText').textContent = passText;
+
+  const suggested = missing.filter(w => TECH_KEYWORDS.has(w)).slice(0, 6);
+  const suggestedSet = new Set(suggested);
+  const restMissing = missing.filter(w => !suggestedSet.has(w));
+
+  const foundTop = matched.slice(0, 20);
+  const missingTop = restMissing.slice(0, 15);
+
+  document.getElementById('foundCount').textContent = matched.length;
+  document.getElementById('missingCount').textContent = missing.length;
+  document.getElementById('suggestedCount').textContent = suggested.length;
+
+  renderPills('foundKeywordsContainer', foundTop, 'pill-success');
+  renderPills('missingKeywordsContainer', missingTop, 'pill-danger');
+  renderPills('suggestedKeywordsContainer', suggested, 'pill-accent');
+
+  if (foundTop.length === 0) document.getElementById('foundKeywordsContainer').innerHTML = '<span class="muted small">No overlapping keywords found.</span>';
+  if (missingTop.length === 0) document.getElementById('missingKeywordsContainer').innerHTML = '<span class="muted small">Nothing major missing.</span>';
+  if (suggested.length === 0) document.getElementById('suggestedKeywordsContainer').innerHTML = '<span class="muted small">No specific suggestions.</span>';
+}
+
+function renderSectionAudit(resumeText) {
+  const rows = auditSections(resumeText);
+  const tbody = document.getElementById('sectionAuditBody');
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.name}</td>
+      <td><span class="pill ${r.ok ? 'pill-success' : 'pill-warning'}">${r.ok ? 'Complete' : 'Improve'}</span></td>
+      <td class="muted">${r.suggestion}</td>
+    </tr>
+  `).join('');
+}
+
+// ------------------------------------------------------------
+// Analyze button
+// ------------------------------------------------------------
+rescanBtn.addEventListener('click', async () => {
+  if (!currentResumeText.trim()) {
+    showStatus('Upload a resume file first.', 'err');
+    return;
+  }
+  if (!currentJD.trim()) {
+    showStatus('Add a job description first (click "Change JD").', 'err');
+    return;
+  }
+
+  rescanBtn.disabled = true;
+  rescanBtn.innerHTML = '<span class="spin"></span> Analyzing...';
+
+  try {
+    const result = analyzeResume(currentJD, currentResumeText);
+    renderResults(result);
+    renderSectionAudit(currentResumeText);
+
+    const { error } = await saveResumeScan({
+      file_name: currentFileName,
+      ats_score: result.score,
+      matched_keywords: result.matched,
+      missing_keywords: result.missing,
+      feedback: result.matchLevel
+    });
+
+    if (error) {
+      showStatus('Scored locally, but saving to your history failed: ' + (error.message || error), 'err');
+    } else {
+      showStatus('Analysis complete and saved to your resume history.', 'ok');
+    }
+  } catch (err) {
+    console.error(err);
+    showStatus('Analysis failed: ' + err.message, 'err');
+  } finally {
+    rescanBtn.disabled = false;
+    rescanBtn.textContent = 'Analyze Resume';
+  }
+});
+
+// ------------------------------------------------------------
+// Load the user's most recent saved scan on page load, if any
+// ------------------------------------------------------------
+async function loadLatestScan() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return;
+
+    const { data, error } = await supabaseClient
+      .from('resume_scans')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (error || !data || !data.length) return;
+
+    const last = data[0];
+    document.getElementById('currentFileName').textContent = last.file_name || 'Previous resume';
+    renderResults({
+      score: last.ats_score,
+      matched: last.matched_keywords || [],
+      missing: last.missing_keywords || []
+    });
+    showStatus(`Showing your last scan for "${last.file_name || 'previous resume'}". Upload a new file to rescan.`, 'info');
+  } catch (err) {
+    // Non-fatal — just leave the page in its empty state.
+    console.warn('Could not load previous scan:', err);
+  }
+}
 </script>
 </body>
 </html>
