@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Settings · CareerPrepX</title>
+<meta name="description" content="Manage your CareerPrepX account settings." />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<style>
+  .field-group { margin-top:16px; }
+  .field-label { font-size:12px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); margin-bottom:6px; display:block; }
+  .field-input { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); font-family:inherit; font-size:14px; }
+  .field-hint { font-size:12px; color:var(--text-muted); margin-top:6px; }
+  .status-msg { margin-top:14px; font-size:13px; padding:10px 12px; border-radius:10px; display:none; }
+  .status-msg.show { display:block; }
+  .status-msg.err { background:color-mix(in oklab, var(--danger) 14%, transparent); color:var(--danger); border:1px solid color-mix(in oklab, var(--danger) 40%, transparent); }
+  .status-msg.ok { background:color-mix(in oklab, var(--success) 14%, transparent); color:var(--success); border:1px solid color-mix(in oklab, var(--success) 40%, transparent); }
+  .settings-row { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border); }
+  .settings-row:last-child { border-bottom:none; }
+  .settings-row .label { font-weight:600; }
+  .settings-row .desc { font-size:13px; color:var(--text-muted); margin-top:2px; }
+  .danger-zone { border:1px solid color-mix(in oklab, var(--danger) 35%, transparent); border-radius:14px; padding:18px; margin-top:20px; }
+  .danger-zone h3 { color:var(--danger); }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <a href="index.html" class="brand"><span class="brand-mark">C</span> Career<span style="color:var(--accent)">PrepX</span></a>
+    <nav class="side-nav">
+      <a href="dashboard.html">◆ Dashboard</a>
+      <a href="aptitude.html">⚡ Aptitude</a>
+      <a href="resume.html">📄 Resume ATS</a>
+      <a href="coding.html">⌨ Coding Arena</a>
+      <a href="interview.html">🎤 Mock Interview</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="settings.html" class="active">⚙ Settings</a>
+      <a href="index.html">← Back to site</a>
+      <a href="#" onclick="signOutAndRedirect(); return false;">⎋ Sign Out</a>
+    </nav>
+    <div style="margin-top:20px;"><button class="theme-toggle" data-theme-toggle style="width:100%;justify-content:center;"><span data-theme-label>☀ Light</span></button></div>
+  </aside>
+ 
+  <main class="main">
+    <div class="page-head">
+      <div>
+        <h1>Settings</h1>
+        <p>Manage your account, security, and appearance.</p>
+      </div>
+    </div>
+ 
+    <div class="grid" style="grid-template-columns:1fr; max-width:560px; gap:20px;">
+ 
+      <div class="panel">
+        <h3>Appearance</h3>
+        <div class="settings-row">
+          <div>
+            <div class="label">Theme</div>
+            <div class="desc">Switch between light and dark mode.</div>
+          </div>
+          <button class="btn btn-outline" data-theme-toggle><span data-theme-label>☀ Light</span></button>
+        </div>
+      </div>
+ 
+      <div class="panel">
+        <h3>Change Password</h3>
+        <form id="passwordForm">
+          <div class="field-group">
+            <label class="field-label" for="newPasswordInput">New Password</label>
+            <input type="password" id="newPasswordInput" class="field-input" placeholder="At least 6 characters" minlength="6" required />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="confirmPasswordInput">Confirm New Password</label>
+            <input type="password" id="confirmPasswordInput" class="field-input" placeholder="Re-enter new password" minlength="6" required />
+          </div>
+          <div class="field-group">
+            <button type="submit" class="btn btn-primary" id="savePasswordBtn">Update Password</button>
+          </div>
+          <div class="status-msg" id="passwordStatusMsg"></div>
+        </form>
+      </div>
+ 
+      <div class="panel">
+        <h3>Session</h3>
+        <div class="settings-row">
+          <div>
+            <div class="label">Sign out everywhere</div>
+            <div class="desc">Sign out of CareerPrepX on all devices, including this one.</div>
+          </div>
+          <button class="btn btn-outline" id="signOutAllBtn">Sign out all devices</button>
+        </div>
+      </div>
+ 
+      <div class="danger-zone">
+        <h3>Danger Zone</h3>
+        <div class="settings-row" style="border-bottom:none;">
+          <div>
+            <div class="label">Delete account</div>
+            <div class="desc">Account deletion isn't self-serve yet — contact support to permanently remove your account and data.</div>
+          </div>
+        </div>
+      </div>
+ 
+    </div>
+  </main>
+</div>
+ 
+<script src="script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = await requireAuth();
+  if (!user) return;
+});
+ 
+const passwordStatusMsg = document.getElementById('passwordStatusMsg');
+function showPasswordStatus(text, type) {
+  passwordStatusMsg.textContent = text;
+  passwordStatusMsg.className = 'status-msg show ' + type;
+}
+ 
+document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const newPassword = document.getElementById('newPasswordInput').value;
+  const confirmPassword = document.getElementById('confirmPasswordInput').value;
+  const saveBtn = document.getElementById('savePasswordBtn');
+ 
+  if (newPassword.length < 6) {
+    showPasswordStatus('Password must be at least 6 characters.', 'err');
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    showPasswordStatus('Passwords do not match.', 'err');
+    return;
+  }
+ 
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Updating…';
+ 
+  try {
+    const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+    if (error) {
+      showPasswordStatus('Could not update password: ' + error.message, 'err');
+    } else {
+      showPasswordStatus('Password updated successfully.', 'ok');
+      document.getElementById('passwordForm').reset();
+    }
+  } catch (err) {
+    showPasswordStatus('Something went wrong: ' + err.message, 'err');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Update Password';
+  }
+});
+ 
+document.getElementById('signOutAllBtn').addEventListener('click', async () => {
+  if (!confirm('Sign out of CareerPrepX on all devices?')) return;
+  await supabaseClient.auth.signOut({ scope: 'global' });
+  window.location.href = 'login.html';
+});
+</script>
+</body>
+</html>
+ 
